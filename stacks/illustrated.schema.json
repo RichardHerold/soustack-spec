@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soustack.spec/stacks/illustrated.schema.json",
+  "title": "Illustrated Stack",
+  "type": "object",
+  "properties": {
+    "images": {
+      "type": "array",
+      "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
+    },
+    "videos": {
+      "type": "array",
+      "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
+    },
+    "instructions": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/illustratedStep" },
+          { "$ref": "#/$defs/illustratedSection" }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "illustratedStep": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "images": { "type": "array", "items": { "$ref": "../defs/common.schema.json#/properties/uri" } },
+        "videos": { "type": "array", "items": { "$ref": "../defs/common.schema.json#/properties/uri" } }
+      },
+      "required": ["id", "text"],
+      "additionalProperties": true
+    },
+    "illustratedSection": {
+      "type": "object",
+      "properties": {
+        "section": { "type": "string" },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/illustratedStep" }
+        }
+      },
+      "required": ["section", "steps"],
+      "additionalProperties": false
+    }
+  }
+}

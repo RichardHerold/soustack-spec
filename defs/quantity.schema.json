@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soustack.spec/defs/quantity.schema.json",
+  "title": "Quantity",
+  "type": "object",
+  "properties": {
+    "amount": { "type": "number" },
+    "unit": { "type": "string", "minLength": 1 }
+  },
+  "required": ["amount", "unit"],
+  "additionalProperties": false
+}

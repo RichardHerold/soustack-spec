@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soustack.spec/soustack.schema.json",
+  "title": "Soustack Specification",
+  "type": "object",
+  "properties": {
+    "$schema": { "const": "https://json-schema.org/draft/2020-12/schema" },
+    "level": { "type": "string", "enum": ["lite", "base"] },
+    "stacks": {
+      "type": "array",
+      "items": { "$ref": "./defs/common.schema.json#/properties/stackId" },
+      "uniqueItems": true
+    },
+    "name": { "type": "string" },
+    "yield": {
+      "type": "object",
+      "properties": {
+        "amount": { "type": "number", "exclusiveMinimum": 0 },
+        "unit": { "type": "string", "minLength": 1 }
+      },
+      "required": ["amount", "unit"],
+      "additionalProperties": false
+    },
+    "time": {
+      "type": "object",
+      "properties": {
+        "total": { "$ref": "./defs/duration.schema.json#/properties/DurationMinutes" }
+      },
+      "required": ["total"],
+      "additionalProperties": false
+    },
+    "ingredients": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "type": "string" },
+          { "$ref": "#/$defs/ingredient" },
+          { "$ref": "#/$defs/ingredientSection" }
+        ]
+      }
+    },
+    "instructions": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "type": "string" },
+          { "$ref": "#/$defs/step" },
+          { "$ref": "#/$defs/stepSection" }
+        ]
+      }
+    },
+    "metadata": { "type": "object", "additionalProperties": true },
+    "images": { "type": "array", "items": { "$ref": "./defs/common.schema.json#/properties/uri" } },
+    "videos": { "type": "array", "items": { "$ref": "./defs/common.schema.json#/properties/uri" } },
+    "dietary": { "$ref": "./stacks/dietary.schema.json#/properties/dietary" },
+    "storage": { "$ref": "./stacks/storage.schema.json#/properties/storage" },
+    "substitutions": { "$ref": "./stacks/substitutions.schema.json#/properties/substitutions" },
+    "techniques": { "$ref": "./stacks/techniques.schema.json#/properties/techniques" },
+    "temperatures": { "$ref": "./stacks/temperature.schema.json#/properties/temperatures" }
+  },
+  "patternProperties": {
+    "^x-": { "$ref": "./defs/common.schema.json#/properties/extensionLaneValue" }
+  },
+  "required": ["$schema", "level", "stacks", "name", "ingredients", "instructions"],
+  "allOf": [
+    {
+      "if": { "properties": { "level": { "const": "base" } } },
+      "then": { "required": ["yield", "time"] }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "quantified" } } } },
+      "then": {
+        "properties": {
+          "ingredients": { "$ref": "./stacks/quantified.schema.json#/properties/ingredients" }
+        },
+        "required": ["ingredients"]
+      }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "structured" } } } },
+      "then": {
+        "properties": {
+          "instructions": { "$ref": "./stacks/structured.schema.json#/properties/instructions" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "timed" } } } },
+      "then": {
+        "properties": {
+          "instructions": { "$ref": "./stacks/timed.schema.json#/properties/instructions" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "referenced" } } } },
+      "then": {
+        "properties": {
+          "ingredients": { "$ref": "./stacks/referenced.schema.json#/properties/ingredients" },
+          "instructions": { "$ref": "./stacks/referenced.schema.json#/properties/instructions" }
+        },
+        "required": ["ingredients", "instructions"]
+      }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "timed" } } } },
+      "then": {
+        "properties": {
+          "stacks": {
+            "contains": { "const": "structured" }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "referenced" } } } },
+      "then": {
+        "properties": {
+          "stacks": {
+            "contains": { "const": "structured" }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "compute" } } } },
+      "then": {
+        "properties": {
+          "level": { "const": "base" },
+          "stacks": {
+            "allOf": [
+              { "contains": { "const": "quantified" } },
+              { "contains": { "const": "timed" } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "storage" } } } },
+      "then": { "required": ["storage"] }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "dietary" } } } },
+      "then": { "required": ["dietary"] }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "substitutions" } } } },
+      "then": { "required": ["substitutions"] }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "techniques" } } } },
+      "then": { "required": ["techniques"] }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "const": "illustrated" } } } },
+      "then": {
+        "anyOf": [
+          { "required": ["images"] },
+          { "required": ["videos"] },
+          { "properties": { "instructions": { "minItems": 1 } } }
+        ]
+      }
+    }
+  ],
+  "unevaluatedProperties": false,
+  "$defs": {
+    "ingredient": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "quantity": { "$ref": "./defs/quantity.schema.json" },
+        "notes": { "type": "string" }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    },
+    "ingredientSection": {
+      "type": "object",
+      "properties": {
+        "section": { "type": "string" },
+        "ingredients": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ingredient" }
+        }
+      },
+      "required": ["section", "ingredients"],
+      "additionalProperties": false
+    },
+    "step": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "dependsOn": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["text"],
+      "additionalProperties": false
+    },
+    "stepSection": {
+      "type": "object",
+      "properties": {
+        "section": { "type": "string" },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/step" }
+        }
+      },
+      "required": ["section", "steps"],
+      "additionalProperties": false
+    }
+  }
+}

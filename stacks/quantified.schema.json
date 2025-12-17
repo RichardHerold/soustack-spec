@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soustack.spec/stacks/quantified.schema.json",
+  "title": "Quantified Stack",
+  "type": "object",
+  "properties": {
+    "ingredients": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/ingredient" },
+          { "$ref": "#/$defs/ingredientSection" }
+        ]
+      }
+    }
+  },
+  "required": ["ingredients"],
+  "$defs": {
+    "ingredient": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "quantity": { "$ref": "../defs/quantity.schema.json" },
+        "temperature": { "$ref": "../defs/temperature.schema.json" },
+        "notes": { "type": "string" }
+      },
+      "required": ["id", "name", "quantity"],
+      "additionalProperties": false
+    },
+    "ingredientSection": {
+      "type": "object",
+      "properties": {
+        "section": { "type": "string" },
+        "ingredients": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ingredient" }
+        }
+      },
+      "required": ["section", "ingredients"],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

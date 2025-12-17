@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soustack.spec/defs/temperature.schema.json",
+  "title": "Temperature",
+  "type": "object",
+  "properties": {
+    "target": {
+      "type": "string",
+      "enum": ["oven", "stovetop", "pan", "oil", "water", "grill", "broiler", "internal", "ambient", "surface"]
+    },
+    "level": {
+      "type": "string",
+      "enum": ["veryLow", "low", "medium", "mediumHigh", "high", "veryHigh"]
+    },
+    "degreesCelsius": { "type": "number" },
+    "degreesFahrenheit": { "type": "number" }
+  },
+  "required": ["target"],
+  "additionalProperties": false
+}

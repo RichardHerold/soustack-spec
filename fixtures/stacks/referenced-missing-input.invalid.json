@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "level": "base",
+  "stacks": ["structured", "referenced"],
+  "name": "Missing Input",
+  "yield": { "amount": 1, "unit": "dish" },
+  "time": { "total": { "minutes": 20 } },
+  "ingredients": [
+    { "id": "i1", "name": "Thing" }
+  ],
+  "instructions": [
+    { "id": "s1", "text": "Do it", "inputs": ["i2"] }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "level": "lite",
+  "stacks": ["storage"],
+  "name": "Bad Storage",
+  "ingredients": ["food"],
+  "instructions": ["store"],
+  "storage": {
+    "frozen": {}
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "soustack-spec",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RichardHerold/soustack-spec.git"
+  },
+  "scripts": {
+    "guard": "node scripts/guard-no-legacy.mjs",
+    "validate": "node scripts/validate-fixtures.mjs",
+    "test": "npm run guard && npm run validate"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  }
+}

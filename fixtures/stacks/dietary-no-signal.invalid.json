@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "level": "lite",
+  "stacks": ["dietary"],
+  "name": "Empty Nutrition",
+  "ingredients": ["water"],
+  "instructions": ["drink"],
+  "dietary": {
+    "basis": "perServing"
+  }
+}

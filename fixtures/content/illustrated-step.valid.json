@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "level": "lite",
+  "stacks": ["structured", "illustrated"],
+  "name": "Picture Smoothie",
+  "ingredients": ["fruit", "yogurt"],
+  "instructions": [
+    {
+      "id": "s1",
+      "text": "blend",
+      "images": ["http://example.com/blend.jpg"]
+    }
+  ],
+  "images": ["http://example.com/cover2.jpg"]
+}
