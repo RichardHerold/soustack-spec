@@ -1,6 +1,6 @@
-# Soustack Spec vNext
+# Soustack Spec
 
-This repository defines the canonical Soustack specification with a single JSON Schema entrypoint and composable stacks. It intentionally omits every legacy profile ladder and schema family. The authoritative source of truth lives at `https://github.com/RichardHerold/soustack-spec`; no artifacts are pulled from the archived read-only repositories.
+This repository defines the canonical Soustack specification with a single JSON Schema entrypoint and composable stacks. 
 
 ## Layout
 - `soustack.schema.json` — canonical schema entrypoint (draft 2020-12)
