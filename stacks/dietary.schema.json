@@ -14,13 +14,18 @@
           "properties": {
             "protein": { "type": "number", "minimum": 0 },
             "fat": { "type": "number", "minimum": 0 },
-            "carbohydrates": { "type": "number", "minimum": 0 }
+            "carbohydrates": { "type": "number", "minimum": 0 },
+            "metadata": { "type": "object", "additionalProperties": true }
           },
           "minProperties": 1,
-          "additionalProperties": false
+          "additionalProperties": false,
+          "patternProperties": {
+            "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+          }
         },
         "diets": { "type": "array", "items": { "type": "string" } },
-        "allergens": { "type": "array", "items": { "type": "string" } }
+        "allergens": { "type": "array", "items": { "type": "string" } },
+        "metadata": { "type": "object", "additionalProperties": true }
       },
       "required": ["basis"],
       "additionalProperties": false,
@@ -29,7 +34,10 @@
         { "required": ["macros"] },
         { "required": ["diets"] },
         { "required": ["allergens"] }
-      ]
+      ],
+      "patternProperties": {
+        "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+      }
     }
   },
   "required": ["dietary"],

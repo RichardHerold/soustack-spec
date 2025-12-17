@@ -24,15 +24,10 @@
   },
   "$defs": {
     "illustratedStep": {
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "text": { "type": "string" },
-        "images": { "type": "array", "items": { "$ref": "../defs/common.schema.json#/properties/uri" } },
-        "videos": { "type": "array", "items": { "$ref": "../defs/common.schema.json#/properties/uri" } }
-      },
-      "required": ["id", "text"],
-      "additionalProperties": true
+      "allOf": [
+        { "$ref": "../defs/entities.schema.json#/$defs/StepBase" },
+        { "required": ["id"] }
+      ]
     },
     "illustratedSection": {
       "type": "object",
@@ -41,10 +36,14 @@
         "steps": {
           "type": "array",
           "items": { "$ref": "#/$defs/illustratedStep" }
-        }
+        },
+        "metadata": { "type": "object", "additionalProperties": true }
       },
       "required": ["section", "steps"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+      }
     }
   }
 }

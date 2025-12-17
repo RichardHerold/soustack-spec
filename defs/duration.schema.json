@@ -7,18 +7,26 @@
     "DurationMinutes": {
       "type": "object",
       "properties": {
-        "minutes": { "type": "number", "exclusiveMinimum": 0 }
+        "minutes": { "type": "number", "exclusiveMinimum": 0 },
+        "metadata": { "type": "object", "additionalProperties": true }
       },
       "required": ["minutes"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "./common.schema.json#/properties/extensionLaneValue" }
+      }
     },
     "StorageDuration": {
       "type": "object",
       "properties": {
-        "iso8601": { "type": "string", "pattern": "^P" }
+        "iso8601": { "type": "string", "pattern": "^P" },
+        "metadata": { "type": "object", "additionalProperties": true }
       },
       "required": ["iso8601"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "./common.schema.json#/properties/extensionLaneValue" }
+      }
     }
   },
   "additionalProperties": false
