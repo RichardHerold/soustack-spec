@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "level": "base",
+  "stacks": ["quantified"],
+  "name": "Bad Quant",
+  "yield": { "amount": 1, "unit": "dish" },
+  "time": { "total": { "minutes": 5 } },
+  "ingredients": ["1 cup mystery"],
+  "instructions": ["mix"]
+}

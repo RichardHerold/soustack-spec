@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soustack.spec/stacks/substitutions.schema.json",
+  "title": "Substitutions Stack",
+  "type": "object",
+  "properties": {
+    "substitutions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "for": { "type": "string" },
+          "alternatives": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "ratio": { "type": "string" }
+              },
+              "required": ["name", "ratio"],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          }
+        },
+        "required": ["for", "alternatives"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["substitutions"],
+  "additionalProperties": false
+}

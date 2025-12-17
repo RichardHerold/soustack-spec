@@ -1,0 +1,1733 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/.github/workflows/validate.yml b/.github/workflows/validate.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..9866609eeb5a6852ca1910cbc8c0e8d3e5bad148
+--- /dev/null
++++ b/.github/workflows/validate.yml
+@@ -0,0 +1,16 @@
++name: Validate
++
++on:
++  push:
++  pull_request:
++
++jobs:
++  test:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-node@v4
++        with:
++          node-version: 20
++      - run: npm ci
++      - run: npm test
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..70c9ee1a6bfc19ed587c411ad24c745f4a1c6f3c
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,28 @@
++# Soustack Spec vNext
++
++This repository defines the canonical Soustack specification with a single JSON Schema entrypoint and composable stacks. It intentionally omits every legacy profile ladder and schema family. The authoritative source of truth lives at `https://github.com/RichardHerold/soustack-spec`; no artifacts are pulled from the archived read-only repositories.
++
++## Layout
++- `soustack.schema.json` — canonical schema entrypoint (draft 2020-12)
++- `defs/` — shared primitives (quantity, duration, temperature, common helpers)
++- `stacks/` — stack-specific schema fragments (quantified, structured, timed, referenced, compute claim, temperature, storage, dietary, substitutions, techniques, illustrated)
++- `fixtures/` — golden fixtures grouped by `level/`, `stacks/`, and `content/`
++- `scripts/` — conformance tooling (`validate-fixtures.mjs`, `guard-no-legacy.mjs`)
++- `.github/workflows/validate.yml` — CI runner
++
++## Levels and stacks
++- **Levels**: `lite` keeps ingredient/step formats flexible. `base` must provide `yield.amount > 0`, `yield.unit`, and `time.total.minutes > 0`.
++- **Stacks**: enable domain-specific guarantees. For example, `quantified` forces ingredient objects with quantities, `structured` forces step objects, `timed` adds timing payloads, and `referenced` wires steps to ingredient IDs. `compute` is only a claim: conformance asserts `level=base` plus both `quantified` and `timed` stacks.
++
++## Running checks
++Install dependencies once:
++```bash
++npm ci
++```
++
++Validate fixtures and the legacy guard together:
++```bash
++npm test
++```
++
++`npm test` will fail if any fixture violates the schema, the semantic conformance rules, or if legacy terminology/directories appear anywhere in the repo.
+diff --git a/SPEC.md b/SPEC.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5c667d6dd7a85aef6c96774a14a0c4bea20264f2
+--- /dev/null
++++ b/SPEC.md
+@@ -0,0 +1,30 @@
++# Soustack Specification (Normative)
++
++## Levels
++- **lite**: MUST include `level`, `stacks`, `name`, `ingredients`, and `instructions`. MAY omit `yield` and `time`. Ingredients and instructions MAY be strings or objects unless stacks override.
++- **base**: MUST include `yield.amount > 0`, `yield.unit` (non-empty), and `time.total.minutes > 0`. All other lite rules apply.
++
++## Canonical entrypoint
++- The only schema entrypoint is `soustack.schema.json` (JSON Schema 2020-12).
++- Top-level MAY include `metadata` and any `x-*` extension properties. All other properties are closed via `unevaluatedProperties: false`.
++- Optional top-level collections used by stacks: `images`, `videos`, `dietary`, `storage`, `substitutions`, `techniques`, `temperatures`.
++
++## Stack rules
++- **quantified**: Ingredients MUST be objects (not strings) and MUST include `id`, `name`, and `quantity.amount` + `quantity.unit`.
++- **structured**: Instructions MUST be step objects (or sections containing steps). Each step MUST include `id` and `text`. `dependsOn` MUST resolve to existing steps and form a DAG.
++- **timed**: Extends structured and MUST also list the `structured` stack. Each step MUST include `timing.activity` and `timing.duration` (either exact `minutes` or range `minMinutes` + `maxMinutes` with `min <= max`). MAY include `timing.completionCue`.
++- **referenced**: Requires structured and MUST list the `structured` stack. Ingredients MUST include `id` and `name` (quantity optional). Steps MUST include `inputs` (string array, min 1) that resolve to ingredient IDs.
++- **compute**: Pure claim. Conformance MUST assert `level=base` with both `quantified` and `timed` stacks (timed already implies structured) and the stack list MUST include those dependencies.
++- **temperature**: When temperature objects appear, they MUST use the `target` enum (`oven`, `stovetop`, `pan`, `oil`, `water`, `grill`, `broiler`, `internal`, `ambient`, `surface`) and temperature levels (`veryLow`, `low`, `medium`, `mediumHigh`, `high`, `veryHigh`). Presence is optional.
++- **storage**: Storage block MUST exist. At least one of `roomTemp`, `refrigerated`, or `frozen` MUST appear. Each method MUST include `duration.iso8601`.
++- **dietary**: Dietary block MUST exist. `basis` MUST be `perServing` or `perRecipe`. At least one signal MUST appear among calories, macros, diets, or allergens.
++- **substitutions**: `substitutions` MUST be non-empty. Each entry MUST include `for` and `alternatives[]`. Each alternative MUST include `name` and `ratio`.
++- **techniques**: Techniques glossary MUST be non-empty with `id` values. Any `techniqueIds` on steps MUST resolve to the glossary.
++- **illustrated**: At least one media URI MUST appear in `images`/`videos` at the recipe level or inside steps/sections. HTTPS is not required.
++
++## Conformance
++- `scripts/validate-fixtures.mjs` is the reference runner. It MUST:
++  - Validate fixtures against `soustack.schema.json`.
++  - Enforce semantic checks: unique ingredient IDs, unique step IDs, resolved and acyclic `dependsOn`, resolved `inputs`, `timed` ranges with `min<=max`, `compute` prerequisites, illustrated media presence, dietary signals, storage ISO-like durations, and technique resolution.
++  - Compare validation results to fixture filenames: `.valid.` MUST pass; `.invalid.` MUST fail.
++- `scripts/guard-no-legacy.mjs` MUST fail if any legacy terms or directories appear.
+diff --git a/defs/common.schema.json b/defs/common.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..8eb2dc0246ac26ddfecffef24972491cddbb101a
+--- /dev/null
++++ b/defs/common.schema.json
+@@ -0,0 +1,37 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/defs/common.schema.json",
++  "title": "Common definitions for Soustack",
++  "type": "object",
++  "properties": {
++    "stackId": {
++      "type": "string",
++      "enum": [
++        "quantified",
++        "structured",
++        "timed",
++        "referenced",
++        "compute",
++        "temperature",
++        "storage",
++        "dietary",
++        "substitutions",
++        "techniques",
++        "illustrated"
++      ]
++    },
++    "extensionLane": {
++      "type": "string",
++      "pattern": "^x-[A-Za-z0-9_-]+$"
++    },
++    "extensionLaneValue": {
++      "description": "Accept any JSON value for extension lanes while keeping the top-level property name constrained.",
++      "type": ["object", "array", "string", "number", "boolean", "null"]
++    },
++    "uri": {
++      "type": "string",
++      "format": "uri"
++    }
++  },
++  "additionalProperties": false
++}
+diff --git a/defs/duration.schema.json b/defs/duration.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..28a416119a307f1bbb15fcc7244fa839be690107
+--- /dev/null
++++ b/defs/duration.schema.json
+@@ -0,0 +1,25 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/defs/duration.schema.json",
++  "title": "Durations",
++  "type": "object",
++  "properties": {
++    "DurationMinutes": {
++      "type": "object",
++      "properties": {
++        "minutes": { "type": "number", "exclusiveMinimum": 0 }
++      },
++      "required": ["minutes"],
++      "additionalProperties": false
++    },
++    "StorageDuration": {
++      "type": "object",
++      "properties": {
++        "iso8601": { "type": "string", "pattern": "^P" }
++      },
++      "required": ["iso8601"],
++      "additionalProperties": false
++    }
++  },
++  "additionalProperties": false
++}
+diff --git a/defs/quantity.schema.json b/defs/quantity.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..f43d21913ae38fc3fd44f8a8e83f283b669b7de0
+--- /dev/null
++++ b/defs/quantity.schema.json
+@@ -0,0 +1,12 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/defs/quantity.schema.json",
++  "title": "Quantity",
++  "type": "object",
++  "properties": {
++    "amount": { "type": "number" },
++    "unit": { "type": "string", "minLength": 1 }
++  },
++  "required": ["amount", "unit"],
++  "additionalProperties": false
++}
+diff --git a/defs/temperature.schema.json b/defs/temperature.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..181546f6f857b2772fcca58a44ab4c195a875124
+--- /dev/null
++++ b/defs/temperature.schema.json
+@@ -0,0 +1,20 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/defs/temperature.schema.json",
++  "title": "Temperature",
++  "type": "object",
++  "properties": {
++    "target": {
++      "type": "string",
++      "enum": ["oven", "stovetop", "pan", "oil", "water", "grill", "broiler", "internal", "ambient", "surface"]
++    },
++    "level": {
++      "type": "string",
++      "enum": ["veryLow", "low", "medium", "mediumHigh", "high", "veryHigh"]
++    },
++    "degreesCelsius": { "type": "number" },
++    "degreesFahrenheit": { "type": "number" }
++  },
++  "required": ["target"],
++  "additionalProperties": false
++}
+diff --git a/fixtures/content/illustrated-step.valid.json b/fixtures/content/illustrated-step.valid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..dce0c53804225d20fc378af2bedc397a5b332fed
+--- /dev/null
++++ b/fixtures/content/illustrated-step.valid.json
+@@ -0,0 +1,15 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "lite",
++  "stacks": ["structured", "illustrated"],
++  "name": "Picture Smoothie",
++  "ingredients": ["fruit", "yogurt"],
++  "instructions": [
++    {
++      "id": "s1",
++      "text": "blend",
++      "images": ["http://example.com/blend.jpg"]
++    }
++  ],
++  "images": ["http://example.com/cover2.jpg"]
++}
+diff --git a/fixtures/level/base-full.valid.json b/fixtures/level/base-full.valid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..2e89c1ca304183aee534dc90ba7bc2206e51f846
+--- /dev/null
++++ b/fixtures/level/base-full.valid.json
+@@ -0,0 +1,61 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "base",
++  "stacks": ["quantified", "structured", "timed", "referenced", "compute", "temperature", "storage", "dietary", "substitutions", "techniques", "illustrated"],
++  "name": "Garlic Pasta",
++  "yield": { "amount": 4, "unit": "servings" },
++  "time": { "total": { "minutes": 45 } },
++  "ingredients": [
++    { "id": "i1", "name": "pasta", "quantity": { "amount": 500, "unit": "g" } },
++    { "id": "i2", "name": "garlic", "quantity": { "amount": 4, "unit": "clove" } }
++  ],
++  "instructions": [
++    {
++      "id": "s1",
++      "text": "Boil water",
++      "timing": { "activity": "boil", "duration": { "minutes": 10 } },
++      "inputs": ["i1"],
++      "techniqueIds": ["t1"],
++      "images": ["http://example.com/step1.jpg"]
++    },
++    {
++      "id": "s2",
++      "text": "Cook pasta",
++      "timing": { "activity": "cook", "duration": { "minMinutes": 8, "maxMinutes": 10 } },
++      "dependsOn": ["s1"],
++      "inputs": ["i1"],
++      "techniqueIds": ["t2"],
++      "temperature": { "target": "water", "level": "high" },
++      "videos": ["http://example.com/v1.mp4"]
++    },
++    {
++      "id": "s3",
++      "text": "Saute garlic",
++      "timing": { "activity": "saute", "duration": { "minutes": 5 }, "completionCue": "fragrant" },
++      "dependsOn": ["s2"],
++      "inputs": ["i2"],
++      "techniqueIds": ["t1", "t3"],
++      "temperature": { "target": "stovetop", "level": "medium" }
++    }
++  ],
++  "images": ["http://example.com/cover.jpg"],
++  "videos": ["http://example.com/cover.mp4"],
++  "dietary": { "basis": "perServing", "calories": 400, "diets": ["vegetarian"] },
++  "storage": { "refrigerated": { "duration": { "iso8601": "P2D" } } },
++  "substitutions": [
++    {
++      "for": "garlic",
++      "alternatives": [
++        { "name": "shallot", "ratio": "1:1" }
++      ]
++    }
++  ],
++  "techniques": [
++    { "id": "t1", "name": "Boil" },
++    { "id": "t2", "name": "Simmer" },
++    { "id": "t3", "name": "Saute" }
++  ],
++  "temperatures": [
++    { "target": "oven", "level": "medium", "degreesFahrenheit": 350 }
++  ]
++}
+diff --git a/fixtures/level/base-missing-yield.invalid.json b/fixtures/level/base-missing-yield.invalid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..f472c5328719fafbe2cf3972bb65d766e2b2c199
+--- /dev/null
++++ b/fixtures/level/base-missing-yield.invalid.json
+@@ -0,0 +1,8 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "base",
++  "stacks": [],
++  "name": "Broken Recipe",
++  "ingredients": ["thing"],
++  "instructions": ["do"]
++}
+diff --git a/fixtures/level/lite-min.valid.json b/fixtures/level/lite-min.valid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..abf55d27113c6f73cead785b0ad85c4ae1976507
+--- /dev/null
++++ b/fixtures/level/lite-min.valid.json
+@@ -0,0 +1,8 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "lite",
++  "stacks": [],
++  "name": "Simple Toast",
++  "ingredients": ["bread slice", "butter"],
++  "instructions": ["toast bread", "spread butter"]
++}
+diff --git a/fixtures/stacks/compute-missing-timed.invalid.json b/fixtures/stacks/compute-missing-timed.invalid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..a2a47ce6b555a663947422fbd4df3b98a8b726fa
+--- /dev/null
++++ b/fixtures/stacks/compute-missing-timed.invalid.json
+@@ -0,0 +1,14 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "base",
++  "stacks": ["quantified", "compute"],
++  "name": "Compute Without Timed",
++  "yield": { "amount": 1, "unit": "dish" },
++  "time": { "total": { "minutes": 10 } },
++  "ingredients": [
++    { "id": "i1", "name": "item", "quantity": { "amount": 1, "unit": "cup" } }
++  ],
++  "instructions": [
++    { "text": "do" }
++  ]
++}
+diff --git a/fixtures/stacks/dietary-no-signal.invalid.json b/fixtures/stacks/dietary-no-signal.invalid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..94522f9e7997deb66992732f531da6f62fc59361
+--- /dev/null
++++ b/fixtures/stacks/dietary-no-signal.invalid.json
+@@ -0,0 +1,11 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "lite",
++  "stacks": ["dietary"],
++  "name": "Empty Nutrition",
++  "ingredients": ["water"],
++  "instructions": ["drink"],
++  "dietary": {
++    "basis": "perServing"
++  }
++}
+diff --git a/fixtures/stacks/illustrated-empty.invalid.json b/fixtures/stacks/illustrated-empty.invalid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..671e3c80fba6b3e1eb501c9f1a4a42b3ad01af3c
+--- /dev/null
++++ b/fixtures/stacks/illustrated-empty.invalid.json
+@@ -0,0 +1,8 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "lite",
++  "stacks": ["illustrated"],
++  "name": "No Media",
++  "ingredients": ["thing"],
++  "instructions": ["step"]
++}
+diff --git a/fixtures/stacks/quantified-string.invalid.json b/fixtures/stacks/quantified-string.invalid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..9c70b871145c6668ce46ce3fe8044a455c1e8fe2
+--- /dev/null
++++ b/fixtures/stacks/quantified-string.invalid.json
+@@ -0,0 +1,10 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "base",
++  "stacks": ["quantified"],
++  "name": "Bad Quant",
++  "yield": { "amount": 1, "unit": "dish" },
++  "time": { "total": { "minutes": 5 } },
++  "ingredients": ["1 cup mystery"],
++  "instructions": ["mix"]
++}
+diff --git a/fixtures/stacks/referenced-missing-input.invalid.json b/fixtures/stacks/referenced-missing-input.invalid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..ff1f6b6096cd33f941feeb2665dae0a20239d121
+--- /dev/null
++++ b/fixtures/stacks/referenced-missing-input.invalid.json
+@@ -0,0 +1,14 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "base",
++  "stacks": ["structured", "referenced"],
++  "name": "Missing Input",
++  "yield": { "amount": 1, "unit": "dish" },
++  "time": { "total": { "minutes": 20 } },
++  "ingredients": [
++    { "id": "i1", "name": "Thing" }
++  ],
++  "instructions": [
++    { "id": "s1", "text": "Do it", "inputs": ["i2"] }
++  ]
++}
+diff --git a/fixtures/stacks/storage-min.valid.json b/fixtures/stacks/storage-min.valid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..b5831f08bddf481f58d108631cbc25947908d81f
+--- /dev/null
++++ b/fixtures/stacks/storage-min.valid.json
+@@ -0,0 +1,11 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "lite",
++  "stacks": ["storage"],
++  "name": "Leftover Soup",
++  "ingredients": ["soup"],
++  "instructions": ["reheat when ready"],
++  "storage": {
++    "refrigerated": { "duration": { "iso8601": "P3D" } }
++  }
++}
+diff --git a/fixtures/stacks/storage-no-duration.invalid.json b/fixtures/stacks/storage-no-duration.invalid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..def61fcf8d943600adaf8e418186d20d9c3ffdd7
+--- /dev/null
++++ b/fixtures/stacks/storage-no-duration.invalid.json
+@@ -0,0 +1,11 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "lite",
++  "stacks": ["storage"],
++  "name": "Bad Storage",
++  "ingredients": ["food"],
++  "instructions": ["store"],
++  "storage": {
++    "frozen": {}
++  }
++}
+diff --git a/fixtures/stacks/timed-range.invalid.json b/fixtures/stacks/timed-range.invalid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..6fced4c64fd12a3077b6a129336df78eea09aebf
+--- /dev/null
++++ b/fixtures/stacks/timed-range.invalid.json
+@@ -0,0 +1,16 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "level": "base",
++  "stacks": ["structured", "timed"],
++  "name": "Bad Range",
++  "yield": { "amount": 2, "unit": "servings" },
++  "time": { "total": { "minutes": 15 } },
++  "ingredients": ["water"],
++  "instructions": [
++    {
++      "id": "s1",
++      "text": "Wait",
++      "timing": { "activity": "rest", "duration": { "minMinutes": 10, "maxMinutes": 5 } }
++    }
++  ]
++}
+diff --git a/package-lock.json b/package-lock.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..b75807063e8ee872fa68690ba923ef999a832010
+--- /dev/null
++++ b/package-lock.json
+@@ -0,0 +1,116 @@
++{
++  "name": "soustack-spec",
++  "version": "0.0.1",
++  "lockfileVersion": 3,
++  "requires": true,
++  "packages": {
++    "": {
++      "name": "soustack-spec",
++      "version": "0.0.1",
++      "license": "UNLICENSED",
++      "dependencies": {
++        "ajv": "^8.17.1",
++        "ajv-formats": "^3.0.1"
++      }
++    },
++    "node_modules/ajv": {
++      "version": "8.17.1",
++      "resolved": "https://registry.npmjs.org/ajv/-/ajv-8.17.1.tgz",
++      "integrity": "sha512-PLACEHOLDER",
++      "dependencies": {
++        "fast-deep-equal": "^3.1.3",
++        "json-schema-traverse": "^1.0.0",
++        "require-from-string": "^2.0.2"
++      }
++    },
++    "node_modules/ajv-formats": {
++      "version": "3.0.1",
++      "resolved": "https://registry.npmjs.org/ajv-formats/-/ajv-formats-3.0.1.tgz",
++      "integrity": "sha512-PLACEHOLDER",
++      "peerDependencies": {
++        "ajv": ">=8"
++      },
++      "dependencies": {
++        "ajv": "^8.0.0",
++        "uri-js": "^4.4.1"
++      }
++    },
++    "node_modules/fast-deep-equal": {
++      "version": "3.1.3",
++      "resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
++      "integrity": "sha512-PLACEHOLDER"
++    },
++    "node_modules/json-schema-traverse": {
++      "version": "1.0.0",
++      "resolved": "https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-1.0.0.tgz",
++      "integrity": "sha512-PLACEHOLDER"
++    },
++    "node_modules/require-from-string": {
++      "version": "2.0.2",
++      "resolved": "https://registry.npmjs.org/require-from-string/-/require-from-string-2.0.2.tgz",
++      "integrity": "sha512-PLACEHOLDER"
++    },
++    "node_modules/uri-js": {
++      "version": "4.4.1",
++      "resolved": "https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz",
++      "integrity": "sha512-PLACEHOLDER",
++      "dependencies": {
++        "punycode": "^2.1.0"
++      }
++    },
++    "node_modules/punycode": {
++      "version": "2.3.1",
++      "resolved": "https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz",
++      "integrity": "sha512-PLACEHOLDER"
++    }
++  },
++  "dependencies": {
++    "ajv": {
++      "version": "8.17.1",
++      "resolved": "https://registry.npmjs.org/ajv/-/ajv-8.17.1.tgz",
++      "integrity": "sha512-PLACEHOLDER",
++      "requires": {
++        "fast-deep-equal": "^3.1.3",
++        "json-schema-traverse": "^1.0.0",
++        "require-from-string": "^2.0.2"
++      }
++    },
++    "ajv-formats": {
++      "version": "3.0.1",
++      "resolved": "https://registry.npmjs.org/ajv-formats/-/ajv-formats-3.0.1.tgz",
++      "integrity": "sha512-PLACEHOLDER",
++      "requires": {
++        "ajv": "^8.0.0",
++        "uri-js": "^4.4.1"
++      }
++    },
++    "fast-deep-equal": {
++      "version": "3.1.3",
++      "resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
++      "integrity": "sha512-PLACEHOLDER"
++    },
++    "json-schema-traverse": {
++      "version": "1.0.0",
++      "resolved": "https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-1.0.0.tgz",
++      "integrity": "sha512-PLACEHOLDER"
++    },
++    "require-from-string": {
++      "version": "2.0.2",
++      "resolved": "https://registry.npmjs.org/require-from-string/-/require-from-string-2.0.2.tgz",
++      "integrity": "sha512-PLACEHOLDER"
++    },
++    "uri-js": {
++      "version": "4.4.1",
++      "resolved": "https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz",
++      "integrity": "sha512-PLACEHOLDER",
++      "requires": {
++        "punycode": "^2.1.0"
++      }
++    },
++    "punycode": {
++      "version": "2.3.1",
++      "resolved": "https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz",
++      "integrity": "sha512-PLACEHOLDER"
++    }
++  }
++}
+diff --git a/package.json b/package.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..32694ac7d2d29d7b8bd00eb1da1aea3e4dc0ab70
+--- /dev/null
++++ b/package.json
+@@ -0,0 +1,19 @@
++{
++  "name": "soustack-spec",
++  "version": "0.0.1",
++  "type": "module",
++  "private": true,
++  "repository": {
++    "type": "git",
++    "url": "https://github.com/RichardHerold/soustack-spec.git"
++  },
++  "scripts": {
++    "guard": "node scripts/guard-no-legacy.mjs",
++    "validate": "node scripts/validate-fixtures.mjs",
++    "test": "npm run guard && npm run validate"
++  },
++  "dependencies": {
++    "ajv": "^8.17.1",
++    "ajv-formats": "^3.0.1"
++  }
++}
+diff --git a/scripts/guard-no-legacy.mjs b/scripts/guard-no-legacy.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..82e77a80103a1b65c4d2f12da093f20ded179fe3
+--- /dev/null
++++ b/scripts/guard-no-legacy.mjs
+@@ -0,0 +1,71 @@
++#!/usr/bin/env node
++import { readdir, stat, readFile } from 'node:fs/promises';
++import { join } from 'node:path';
++
++const forbiddenPaths = [
++  'profiles',
++  'schemas/recipe',
++  'schemas/registry'
++];
++
++const forbiddenTerms = [
++  'cookable',
++  'schedulable',
++  'scalable profile',
++  'profiles/quantified'
++];
++
++async function pathExists(target) {
++  try {
++    await stat(target);
++    return true;
++  } catch {
++    return false;
++  }
++}
++
++async function walk(dir, visitors) {
++  const entries = await readdir(dir, { withFileTypes: true });
++  for (const entry of entries) {
++    if (entry.name === '.git' || entry.name === 'node_modules') continue;
++    const full = join(dir, entry.name);
++    if (entry.isDirectory()) {
++      await walk(full, visitors);
++    } else {
++      await visitors(full);
++    }
++  }
++}
++
++async function main() {
++  let violations = [];
++  const scriptPath = join(process.cwd(), 'scripts', 'guard-no-legacy.mjs');
++
++  for (const rel of forbiddenPaths) {
++    const exists = await pathExists(join(process.cwd(), rel));
++    if (exists) {
++      violations.push(`forbidden path present: ${rel}`);
++    }
++  }
++
++  await walk(process.cwd(), async (file) => {
++    if (file === scriptPath) return;
++    const content = await readFile(file, 'utf8');
++    for (const term of forbiddenTerms) {
++      if (content.toLowerCase().includes(term.toLowerCase())) {
++        violations.push(`forbidden term "${term}" found in ${file}`);
++      }
++    }
++  });
++
++  if (violations.length) {
++    console.error('Legacy guard failed:');
++    for (const v of violations) console.error(` - ${v}`);
++    process.exit(1);
++  }
++}
++
++main().catch((err) => {
++  console.error(err);
++  process.exit(1);
++});
+diff --git a/scripts/validate-fixtures.mjs b/scripts/validate-fixtures.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..8f0263d96626c4fd3c316333ca7c43f44c233151
+--- /dev/null
++++ b/scripts/validate-fixtures.mjs
+@@ -0,0 +1,256 @@
++#!/usr/bin/env node
++import { readdir, readFile } from 'node:fs/promises';
++import { join, extname } from 'node:path';
++import Ajv from 'ajv';
++import addFormats from 'ajv-formats';
++
++const ajv = new Ajv({ strict: false, allErrors: true, allowUnionTypes: true });
++addFormats(ajv);
++
++async function loadSchemas() {
++  const schemaFiles = [];
++  for (const dir of ['defs', 'stacks']) {
++    const entries = await readdir(dir);
++    for (const entry of entries) {
++      if (entry.endsWith('.json')) schemaFiles.push(join(dir, entry));
++    }
++  }
++  schemaFiles.push('soustack.schema.json');
++
++  for (const file of schemaFiles) {
++    const json = JSON.parse(await readFile(file, 'utf8'));
++    ajv.addSchema(json, json.$id || file);
++  }
++}
++
++async function walk(dir) {
++  const files = [];
++  const entries = await readdir(dir, { withFileTypes: true });
++  for (const entry of entries) {
++    const full = join(dir, entry.name);
++    if (entry.isDirectory()) {
++      files.push(...(await walk(full)));
++    } else if (extname(full) === '.json') {
++      files.push(full);
++    }
++  }
++  return files;
++}
++
++function collectIngredients(ingredients = []) {
++  const list = [];
++  for (const item of ingredients) {
++    if (item && typeof item === 'object' && Array.isArray(item.ingredients)) {
++      list.push(...collectIngredients(item.ingredients));
++    } else if (item && typeof item === 'object') {
++      list.push(item);
++    }
++  }
++  return list;
++}
++
++function collectSteps(instructions = []) {
++  const steps = [];
++  for (const entry of instructions) {
++    if (entry && typeof entry === 'object' && Array.isArray(entry.steps)) {
++      steps.push(...collectSteps(entry.steps));
++    } else if (entry && typeof entry === 'object') {
++      steps.push(entry);
++    }
++  }
++  return steps;
++}
++
++function uniqueCheck(items, key, label) {
++  const seen = new Set();
++  for (const item of items) {
++    if (!item[key]) continue;
++    if (seen.has(item[key])) {
++      return `${label} id duplicated: ${item[key]}`;
++    }
++    seen.add(item[key]);
++  }
++  return null;
++}
++
++function validateDAG(steps) {
++  const graph = new Map();
++  for (const step of steps) {
++    graph.set(step.id, new Set(step.dependsOn || []));
++  }
++  for (const [id, deps] of graph.entries()) {
++    for (const dep of deps) {
++      if (!graph.has(dep)) {
++        return `dependsOn references missing step: ${dep}`;
++      }
++    }
++  }
++  const visited = new Set();
++  const stack = new Set();
++  function dfs(node) {
++    if (stack.has(node)) return `cycle detected at ${node}`;
++    if (visited.has(node)) return null;
++    stack.add(node);
++    const deps = graph.get(node) || new Set();
++    for (const dep of deps) {
++      const res = dfs(dep);
++      if (res) return res;
++    }
++    stack.delete(node);
++    visited.add(node);
++    return null;
++  }
++  for (const node of graph.keys()) {
++    const res = dfs(node);
++    if (res) return res;
++  }
++  return null;
++}
++
++function checkConformance(data, file) {
++  const errors = [];
++  const stacks = new Set(data.stacks || []);
++  const ingredients = collectIngredients(data.ingredients);
++  const steps = collectSteps(data.instructions);
++
++  if (ingredients.length) {
++    const dup = uniqueCheck(ingredients, 'id', 'ingredient');
++    if (dup) errors.push(dup);
++  }
++  if (steps.length) {
++    const dup = uniqueCheck(steps, 'id', 'step');
++    if (dup) errors.push(dup);
++  }
++
++  if (stacks.has('structured') || stacks.has('timed') || stacks.has('referenced')) {
++    const dagIssue = validateDAG(steps);
++    if (dagIssue) errors.push(dagIssue);
++  }
++
++  if (stacks.has('referenced')) {
++    const ids = new Set(ingredients.map((i) => i.id));
++    for (const step of steps) {
++      if (!Array.isArray(step.inputs) || step.inputs.length === 0) {
++        errors.push('referenced step missing inputs');
++        continue;
++      }
++      for (const input of step.inputs) {
++        if (!ids.has(input)) errors.push(`referenced input missing ingredient id: ${input}`);
++      }
++    }
++  }
++
++  if (stacks.has('timed')) {
++    for (const step of steps) {
++      const duration = step?.timing?.duration;
++      if (duration && typeof duration === 'object' && 'minMinutes' in duration && 'maxMinutes' in duration) {
++        if (!(duration.minMinutes <= duration.maxMinutes)) {
++          errors.push('timed duration minMinutes must be <= maxMinutes');
++        }
++      }
++    }
++  }
++
++  if (stacks.has('compute')) {
++    if (data.level !== 'base' || !stacks.has('quantified') || !stacks.has('timed')) {
++      errors.push('compute stack requires base level with quantified and timed stacks');
++    }
++  }
++
++  if (stacks.has('illustrated')) {
++    const stepHasMedia = steps.some((s) => Array.isArray(s.images)?.length || Array.isArray(s.videos)?.length);
++    const recipeHasMedia = (Array.isArray(data.images) && data.images.length > 0) ||
++      (Array.isArray(data.videos) && data.videos.length > 0);
++    if (!stepHasMedia && !recipeHasMedia) {
++      errors.push('illustrated stack requires at least one media URI');
++    }
++  }
++
++  if (stacks.has('dietary')) {
++    if (!data.dietary) {
++      errors.push('dietary block missing');
++    } else {
++      const { calories, macros, diets, allergens } = data.dietary;
++      const hasSignal = (calories !== undefined) ||
++        (macros && Object.keys(macros).length > 0) ||
++        (Array.isArray(diets) && diets.length > 0) ||
++        (Array.isArray(allergens) && allergens.length > 0);
++      if (!hasSignal) errors.push('dietary stack requires at least one signal');
++    }
++  }
++
++  if (stacks.has('techniques')) {
++    const glossary = Array.isArray(data.techniques) ? data.techniques : [];
++    const glossaryIds = new Set(glossary.map((t) => t.id));
++    for (const step of steps) {
++      for (const tech of step.techniqueIds || []) {
++        if (!glossaryIds.has(tech)) errors.push(`technique reference missing: ${tech}`);
++      }
++    }
++    if (glossary.length === 0) errors.push('techniques stack requires glossary');
++  }
++
++  if (stacks.has('storage')) {
++    const storage = data.storage || {};
++    const methods = ['roomTemp', 'refrigerated', 'frozen'];
++    const present = methods.filter((m) => storage[m]);
++    if (present.length === 0) errors.push('storage stack requires at least one method');
++    for (const method of present) {
++      const duration = storage[method]?.duration?.iso8601;
++      if (!duration || typeof duration !== 'string' || !duration.startsWith('P')) {
++        errors.push(`storage method ${method} missing iso8601 duration`);
++      }
++    }
++  }
++
++  return errors;
++}
++
++async function main() {
++  await loadSchemas();
++  const validate = ajv.getSchema('https://soustack.spec/soustack.schema.json');
++  if (!validate) throw new Error('main schema not loaded');
++
++  const fixtureFiles = await walk('fixtures');
++  let failures = 0;
++
++  for (const file of fixtureFiles) {
++    const raw = await readFile(file, 'utf8');
++    const data = JSON.parse(raw);
++    const expectValid = file.includes('.valid.');
++    const expectInvalid = file.includes('.invalid.');
++
++    if (!expectValid && !expectInvalid) {
++      console.warn(`Skipping fixture without expectation: ${file}`);
++      continue;
++    }
++
++    const schemaOk = validate(data);
++    const schemaErrors = schemaOk ? [] : validate.errors || [];
++    const conformanceErrors = checkConformance(data, file);
++    const overallErrors = [...schemaErrors.map((e) => ajv.errorsText([e], { separator: '; ' })), ...conformanceErrors];
++    const passed = schemaOk && conformanceErrors.length === 0;
++
++    if (expectValid && !passed) {
++      failures++;
++      console.error(`Expected valid but failed: ${file}`);
++      overallErrors.forEach((e) => console.error(` - ${e}`));
++    }
++    if (expectInvalid && passed) {
++      failures++;
++      console.error(`Expected invalid but passed: ${file}`);
++    }
++  }
++
++  if (failures > 0) {
++    console.error(`Conformance failed for ${failures} fixture(s).`);
++    process.exit(1);
++  } else {
++    console.log('All fixtures conform to expectations.');
++  }
++}
++
++main().catch((err) => {
++  console.error(err);
++  process.exit(1);
++});
+diff --git a/soustack.schema.json b/soustack.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..fc2a5a57af2bbbcdff5ecb5866063a1e57c97380
+--- /dev/null
++++ b/soustack.schema.json
+@@ -0,0 +1,218 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/soustack.schema.json",
++  "title": "Soustack Specification",
++  "type": "object",
++  "properties": {
++    "$schema": { "const": "https://json-schema.org/draft/2020-12/schema" },
++    "level": { "type": "string", "enum": ["lite", "base"] },
++    "stacks": {
++      "type": "array",
++      "items": { "$ref": "./defs/common.schema.json#/properties/stackId" },
++      "uniqueItems": true
++    },
++    "name": { "type": "string" },
++    "yield": {
++      "type": "object",
++      "properties": {
++        "amount": { "type": "number", "exclusiveMinimum": 0 },
++        "unit": { "type": "string", "minLength": 1 }
++      },
++      "required": ["amount", "unit"],
++      "additionalProperties": false
++    },
++    "time": {
++      "type": "object",
++      "properties": {
++        "total": { "$ref": "./defs/duration.schema.json#/properties/DurationMinutes" }
++      },
++      "required": ["total"],
++      "additionalProperties": false
++    },
++    "ingredients": {
++      "type": "array",
++      "items": {
++        "anyOf": [
++          { "type": "string" },
++          { "$ref": "#/$defs/ingredient" },
++          { "$ref": "#/$defs/ingredientSection" }
++        ]
++      }
++    },
++    "instructions": {
++      "type": "array",
++      "items": {
++        "anyOf": [
++          { "type": "string" },
++          { "$ref": "#/$defs/step" },
++          { "$ref": "#/$defs/stepSection" }
++        ]
++      }
++    },
++    "metadata": { "type": "object", "additionalProperties": true },
++    "images": { "type": "array", "items": { "$ref": "./defs/common.schema.json#/properties/uri" } },
++    "videos": { "type": "array", "items": { "$ref": "./defs/common.schema.json#/properties/uri" } },
++    "dietary": { "$ref": "./stacks/dietary.schema.json#/properties/dietary" },
++    "storage": { "$ref": "./stacks/storage.schema.json#/properties/storage" },
++    "substitutions": { "$ref": "./stacks/substitutions.schema.json#/properties/substitutions" },
++    "techniques": { "$ref": "./stacks/techniques.schema.json#/properties/techniques" },
++    "temperatures": { "$ref": "./stacks/temperature.schema.json#/properties/temperatures" }
++  },
++  "patternProperties": {
++    "^x-": { "$ref": "./defs/common.schema.json#/properties/extensionLaneValue" }
++  },
++  "required": ["$schema", "level", "stacks", "name", "ingredients", "instructions"],
++  "allOf": [
++    {
++      "if": { "properties": { "level": { "const": "base" } } },
++      "then": { "required": ["yield", "time"] }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "quantified" } } } },
++      "then": {
++        "properties": {
++          "ingredients": { "$ref": "./stacks/quantified.schema.json#/properties/ingredients" }
++        },
++        "required": ["ingredients"]
++      }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "structured" } } } },
++      "then": {
++        "properties": {
++          "instructions": { "$ref": "./stacks/structured.schema.json#/properties/instructions" }
++        }
++      }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "timed" } } } },
++      "then": {
++        "properties": {
++          "instructions": { "$ref": "./stacks/timed.schema.json#/properties/instructions" }
++        }
++      }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "referenced" } } } },
++      "then": {
++        "properties": {
++          "ingredients": { "$ref": "./stacks/referenced.schema.json#/properties/ingredients" },
++          "instructions": { "$ref": "./stacks/referenced.schema.json#/properties/instructions" }
++        },
++        "required": ["ingredients", "instructions"]
++      }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "timed" } } } },
++      "then": {
++        "properties": {
++          "stacks": {
++            "contains": { "const": "structured" }
++          }
++        }
++      }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "referenced" } } } },
++      "then": {
++        "properties": {
++          "stacks": {
++            "contains": { "const": "structured" }
++          }
++        }
++      }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "compute" } } } },
++      "then": {
++        "properties": {
++          "level": { "const": "base" },
++          "stacks": {
++            "allOf": [
++              { "contains": { "const": "quantified" } },
++              { "contains": { "const": "timed" } }
++            ]
++          }
++        }
++      }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "storage" } } } },
++      "then": { "required": ["storage"] }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "dietary" } } } },
++      "then": { "required": ["dietary"] }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "substitutions" } } } },
++      "then": { "required": ["substitutions"] }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "techniques" } } } },
++      "then": { "required": ["techniques"] }
++    },
++    {
++      "if": { "properties": { "stacks": { "contains": { "const": "illustrated" } } } },
++      "then": {
++        "anyOf": [
++          { "required": ["images"] },
++          { "required": ["videos"] },
++          { "properties": { "instructions": { "minItems": 1 } } }
++        ]
++      }
++    }
++  ],
++  "unevaluatedProperties": false,
++  "$defs": {
++    "ingredient": {
++      "type": "object",
++      "properties": {
++        "id": { "type": "string" },
++        "name": { "type": "string" },
++        "quantity": { "$ref": "./defs/quantity.schema.json" },
++        "notes": { "type": "string" }
++      },
++      "required": ["name"],
++      "additionalProperties": false
++    },
++    "ingredientSection": {
++      "type": "object",
++      "properties": {
++        "section": { "type": "string" },
++        "ingredients": {
++          "type": "array",
++          "items": { "$ref": "#/$defs/ingredient" }
++        }
++      },
++      "required": ["section", "ingredients"],
++      "additionalProperties": false
++    },
++    "step": {
++      "type": "object",
++      "properties": {
++        "id": { "type": "string" },
++        "text": { "type": "string" },
++        "dependsOn": {
++          "type": "array",
++          "items": { "type": "string" },
++          "uniqueItems": true
++        }
++      },
++      "required": ["text"],
++      "additionalProperties": false
++    },
++    "stepSection": {
++      "type": "object",
++      "properties": {
++        "section": { "type": "string" },
++        "steps": {
++          "type": "array",
++          "items": { "$ref": "#/$defs/step" }
++        }
++      },
++      "required": ["section", "steps"],
++      "additionalProperties": false
++    }
++  }
++}
+diff --git a/stacks/compute.schema.json b/stacks/compute.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..73bf7bcf119a373dec78b28837ab171d2f91b03a
+--- /dev/null
++++ b/stacks/compute.schema.json
+@@ -0,0 +1,7 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/stacks/compute.schema.json",
++  "title": "Compute Claim Stack",
++  "type": "object",
++  "additionalProperties": false
++}
+diff --git a/stacks/dietary.schema.json b/stacks/dietary.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..3f6e201a81c73eeb56784ad545e7bb87a3d930ae
+--- /dev/null
++++ b/stacks/dietary.schema.json
+@@ -0,0 +1,37 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/stacks/dietary.schema.json",
++  "title": "Dietary Stack",
++  "type": "object",
++  "properties": {
++    "dietary": {
++      "type": "object",
++      "properties": {
++        "basis": { "type": "string", "enum": ["perServing", "perRecipe"] },
++        "calories": { "type": "number", "minimum": 0 },
++        "macros": {
++          "type": "object",
++          "properties": {
++            "protein": { "type": "number", "minimum": 0 },
++            "fat": { "type": "number", "minimum": 0 },
++            "carbohydrates": { "type": "number", "minimum": 0 }
++          },
++          "minProperties": 1,
++          "additionalProperties": false
++        },
++        "diets": { "type": "array", "items": { "type": "string" } },
++        "allergens": { "type": "array", "items": { "type": "string" } }
++      },
++      "required": ["basis"],
++      "additionalProperties": false,
++      "anyOf": [
++        { "required": ["calories"] },
++        { "required": ["macros"] },
++        { "required": ["diets"] },
++        { "required": ["allergens"] }
++      ]
++    }
++  },
++  "required": ["dietary"],
++  "additionalProperties": false
++}
+diff --git a/stacks/illustrated.schema.json b/stacks/illustrated.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..beb91bd249b0fbf3512b6503b5b53d3de86a0f0d
+--- /dev/null
++++ b/stacks/illustrated.schema.json
+@@ -0,0 +1,50 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/stacks/illustrated.schema.json",
++  "title": "Illustrated Stack",
++  "type": "object",
++  "properties": {
++    "images": {
++      "type": "array",
++      "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
++    },
++    "videos": {
++      "type": "array",
++      "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
++    },
++    "instructions": {
++      "type": "array",
++      "items": {
++        "anyOf": [
++          { "$ref": "#/$defs/illustratedStep" },
++          { "$ref": "#/$defs/illustratedSection" }
++        ]
++      }
++    }
++  },
++  "$defs": {
++    "illustratedStep": {
++      "type": "object",
++      "properties": {
++        "id": { "type": "string" },
++        "text": { "type": "string" },
++        "images": { "type": "array", "items": { "$ref": "../defs/common.schema.json#/properties/uri" } },
++        "videos": { "type": "array", "items": { "$ref": "../defs/common.schema.json#/properties/uri" } }
++      },
++      "required": ["id", "text"],
++      "additionalProperties": true
++    },
++    "illustratedSection": {
++      "type": "object",
++      "properties": {
++        "section": { "type": "string" },
++        "steps": {
++          "type": "array",
++          "items": { "$ref": "#/$defs/illustratedStep" }
++        }
++      },
++      "required": ["section", "steps"],
++      "additionalProperties": false
++    }
++  }
++}
+diff --git a/stacks/quantified.schema.json b/stacks/quantified.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..c2cf48c771305967102afe672b18414726a24812
+--- /dev/null
++++ b/stacks/quantified.schema.json
+@@ -0,0 +1,45 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/stacks/quantified.schema.json",
++  "title": "Quantified Stack",
++  "type": "object",
++  "properties": {
++    "ingredients": {
++      "type": "array",
++      "items": {
++        "anyOf": [
++          { "$ref": "#/$defs/ingredient" },
++          { "$ref": "#/$defs/ingredientSection" }
++        ]
++      }
++    }
++  },
++  "required": ["ingredients"],
++  "$defs": {
++    "ingredient": {
++      "type": "object",
++      "properties": {
++        "id": { "type": "string" },
++        "name": { "type": "string" },
++        "quantity": { "$ref": "../defs/quantity.schema.json" },
++        "temperature": { "$ref": "../defs/temperature.schema.json" },
++        "notes": { "type": "string" }
++      },
++      "required": ["id", "name", "quantity"],
++      "additionalProperties": false
++    },
++    "ingredientSection": {
++      "type": "object",
++      "properties": {
++        "section": { "type": "string" },
++        "ingredients": {
++          "type": "array",
++          "items": { "$ref": "#/$defs/ingredient" }
++        }
++      },
++      "required": ["section", "ingredients"],
++      "additionalProperties": false
++    }
++  },
++  "additionalProperties": false
++}
+diff --git a/stacks/referenced.schema.json b/stacks/referenced.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..5f571f85f9970cba19e6cae1cfbda723e7180ac2
+--- /dev/null
++++ b/stacks/referenced.schema.json
+@@ -0,0 +1,94 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/stacks/referenced.schema.json",
++  "title": "Referenced Stack",
++  "type": "object",
++  "allOf": [
++    { "$ref": "./structured.schema.json" },
++    {
++      "properties": {
++        "ingredients": {
++          "type": "array",
++          "items": {
++            "anyOf": [
++              { "$ref": "#/$defs/ingredient" },
++              { "$ref": "#/$defs/ingredientSection" }
++            ]
++          }
++        },
++        "instructions": {
++          "type": "array",
++          "items": {
++            "anyOf": [
++              { "$ref": "#/$defs/referencedStep" },
++              { "$ref": "#/$defs/referencedSection" }
++            ]
++          }
++        }
++      }
++    }
++  ],
++  "$defs": {
++    "ingredient": {
++      "type": "object",
++      "properties": {
++        "id": { "type": "string" },
++        "name": { "type": "string" },
++        "quantity": { "$ref": "../defs/quantity.schema.json" }
++      },
++      "required": ["id", "name"],
++      "additionalProperties": false
++    },
++    "ingredientSection": {
++      "type": "object",
++      "properties": {
++        "section": { "type": "string" },
++        "ingredients": {
++          "type": "array",
++          "items": { "$ref": "#/$defs/ingredient" }
++        }
++      },
++      "required": ["section", "ingredients"],
++      "additionalProperties": false
++    },
++    "referencedStep": {
++      "type": "object",
++      "properties": {
++        "id": { "type": "string" },
++        "text": { "type": "string" },
++        "inputs": {
++          "type": "array",
++          "items": { "type": "string" },
++          "minItems": 1,
++          "uniqueItems": true
++        },
++        "dependsOn": {
++          "type": "array",
++          "items": { "type": "string" },
++          "uniqueItems": true
++        },
++        "techniqueIds": {
++          "type": "array",
++          "items": { "type": "string" },
++          "uniqueItems": true
++        },
++        "images": { "type": "array", "items": { "$ref": "../defs/common.schema.json#/properties/uri" } },
++        "videos": { "type": "array", "items": { "$ref": "../defs/common.schema.json#/properties/uri" } }
++      },
++      "required": ["id", "text", "inputs"],
++      "additionalProperties": false
++    },
++    "referencedSection": {
++      "type": "object",
++      "properties": {
++        "section": { "type": "string" },
++        "steps": {
++          "type": "array",
++          "items": { "$ref": "#/$defs/referencedStep" }
++        }
++      },
++      "required": ["section", "steps"],
++      "additionalProperties": false
++    }
++  }
++}
+diff --git a/stacks/storage.schema.json b/stacks/storage.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..7fcba6bf5e234607bf860562bcac63af02cf8f85
+--- /dev/null
++++ b/stacks/storage.schema.json
+@@ -0,0 +1,31 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/stacks/storage.schema.json",
++  "title": "Storage Stack",
++  "type": "object",
++  "properties": {
++    "storage": {
++      "type": "object",
++      "properties": {
++        "roomTemp": { "$ref": "#/$defs/storageMethod" },
++        "refrigerated": { "$ref": "#/$defs/storageMethod" },
++        "frozen": { "$ref": "#/$defs/storageMethod" }
++      },
++      "minProperties": 1,
++      "additionalProperties": false
++    }
++  },
++  "required": ["storage"],
++  "$defs": {
++    "storageMethod": {
++      "type": "object",
++      "properties": {
++        "duration": { "$ref": "../defs/duration.schema.json#/properties/StorageDuration" },
++        "notes": { "type": "string" }
++      },
++      "required": ["duration"],
++      "additionalProperties": false
++    }
++  },
++  "additionalProperties": false
++}
+diff --git a/stacks/structured.schema.json b/stacks/structured.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..e971aa71ba7d7e142198e180cd03a03454daa37d
+--- /dev/null
++++ b/stacks/structured.schema.json
+@@ -0,0 +1,61 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/stacks/structured.schema.json",
++  "title": "Structured Stack",
++  "type": "object",
++  "properties": {
++    "instructions": {
++      "type": "array",
++      "items": {
++        "anyOf": [
++          { "$ref": "#/$defs/step" },
++          { "$ref": "#/$defs/stepSection" }
++        ]
++      }
++    }
++  },
++  "required": ["instructions"],
++  "$defs": {
++    "step": {
++      "type": "object",
++      "properties": {
++        "id": { "type": "string" },
++        "text": { "type": "string" },
++        "dependsOn": {
++          "type": "array",
++          "items": { "type": "string" },
++          "uniqueItems": true
++        },
++        "temperature": { "$ref": "../defs/temperature.schema.json" },
++        "techniqueIds": {
++          "type": "array",
++          "items": { "type": "string" },
++          "uniqueItems": true
++        },
++        "images": {
++          "type": "array",
++          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
++        },
++        "videos": {
++          "type": "array",
++          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
++        }
++      },
++      "required": ["id", "text"],
++      "additionalProperties": false
++    },
++    "stepSection": {
++      "type": "object",
++      "properties": {
++        "section": { "type": "string" },
++        "steps": {
++          "type": "array",
++          "items": { "$ref": "#/$defs/step" }
++        }
++      },
++      "required": ["section", "steps"],
++      "additionalProperties": false
++    }
++  },
++  "additionalProperties": false
++}
+diff --git a/stacks/substitutions.schema.json b/stacks/substitutions.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..a6ad76ee7f553b67bcd31fc9b4ce1f9e3f67961a
+--- /dev/null
++++ b/stacks/substitutions.schema.json
+@@ -0,0 +1,35 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/stacks/substitutions.schema.json",
++  "title": "Substitutions Stack",
++  "type": "object",
++  "properties": {
++    "substitutions": {
++      "type": "array",
++      "items": {
++        "type": "object",
++        "properties": {
++          "for": { "type": "string" },
++          "alternatives": {
++            "type": "array",
++            "items": {
++              "type": "object",
++              "properties": {
++                "name": { "type": "string" },
++                "ratio": { "type": "string" }
++              },
++              "required": ["name", "ratio"],
++              "additionalProperties": false
++            },
++            "minItems": 1
++          }
++        },
++        "required": ["for", "alternatives"],
++        "additionalProperties": false
++      },
++      "minItems": 1
++    }
++  },
++  "required": ["substitutions"],
++  "additionalProperties": false
++}
+diff --git a/stacks/techniques.schema.json b/stacks/techniques.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..c4e449d3bd8083c2ad3692c15f89f89e0315b9d9
+--- /dev/null
++++ b/stacks/techniques.schema.json
+@@ -0,0 +1,24 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/stacks/techniques.schema.json",
++  "title": "Techniques Stack",
++  "type": "object",
++  "properties": {
++    "techniques": {
++      "type": "array",
++      "items": {
++        "type": "object",
++        "properties": {
++          "id": { "type": "string" },
++          "name": { "type": "string" },
++          "description": { "type": "string" }
++        },
++        "required": ["id", "name"],
++        "additionalProperties": false
++      },
++      "minItems": 1
++    }
++  },
++  "required": ["techniques"],
++  "additionalProperties": false
++}
+diff --git a/stacks/temperature.schema.json b/stacks/temperature.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..86c4bf7b775eabcc6985bc93b5ad6d458f3a562d
+--- /dev/null
++++ b/stacks/temperature.schema.json
+@@ -0,0 +1,12 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/stacks/temperature.schema.json",
++  "title": "Temperature Stack",
++  "type": "object",
++  "properties": {
++    "temperatures": {
++      "type": "array",
++      "items": { "$ref": "../defs/temperature.schema.json" }
++    }
++  }
++}
+diff --git a/stacks/timed.schema.json b/stacks/timed.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..0239ea7a8824af59e50ea8bbd7570e86715e9faf
+--- /dev/null
++++ b/stacks/timed.schema.json
+@@ -0,0 +1,88 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://soustack.spec/stacks/timed.schema.json",
++  "title": "Timed Stack",
++  "type": "object",
++  "allOf": [
++    { "$ref": "./structured.schema.json" },
++    {
++      "properties": {
++        "instructions": {
++          "type": "array",
++          "items": {
++            "anyOf": [
++              { "$ref": "#/$defs/timedStep" },
++              { "$ref": "#/$defs/timedStepSection" }
++            ]
++          }
++        }
++      }
++    }
++  ],
++  "$defs": {
++    "timedStep": {
++      "type": "object",
++      "properties": {
++        "id": { "type": "string" },
++        "text": { "type": "string" },
++        "dependsOn": {
++          "type": "array",
++          "items": { "type": "string" },
++          "uniqueItems": true
++        },
++        "timing": {
++          "type": "object",
++          "properties": {
++            "activity": { "type": "string" },
++            "duration": {
++              "type": "object",
++              "oneOf": [
++                { "$ref": "../defs/duration.schema.json#/properties/DurationMinutes" },
++                {
++                  "type": "object",
++                  "properties": {
++                    "minMinutes": { "type": "number", "exclusiveMinimum": 0 },
++                    "maxMinutes": { "type": "number", "exclusiveMinimum": 0 }
++                  },
++                  "required": ["minMinutes", "maxMinutes"],
++                  "additionalProperties": false
++                }
++              ]
++            },
++            "completionCue": { "type": "string" }
++          },
++          "required": ["activity", "duration"],
++          "additionalProperties": false
++        },
++        "techniqueIds": {
++          "type": "array",
++          "items": { "type": "string" },
++          "uniqueItems": true
++        },
++        "temperature": { "$ref": "../defs/temperature.schema.json" },
++        "images": {
++          "type": "array",
++          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
++        },
++        "videos": {
++          "type": "array",
++          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
++        }
++      },
++      "required": ["id", "text", "timing"],
++      "additionalProperties": false
++    },
++    "timedStepSection": {
++      "type": "object",
++      "properties": {
++        "section": { "type": "string" },
++        "steps": {
++          "type": "array",
++          "items": { "$ref": "#/$defs/timedStep" }
++        }
++      },
++      "required": ["section", "steps"],
++      "additionalProperties": false
++    }
++  }
++}
+ 
+EOF
+)

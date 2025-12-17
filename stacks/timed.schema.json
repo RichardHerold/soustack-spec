@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soustack.spec/stacks/timed.schema.json",
+  "title": "Timed Stack",
+  "type": "object",
+  "allOf": [
+    { "$ref": "./structured.schema.json" },
+    {
+      "properties": {
+        "instructions": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/timedStep" },
+              { "$ref": "#/$defs/timedStepSection" }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "timedStep": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "dependsOn": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "timing": {
+          "type": "object",
+          "properties": {
+            "activity": { "type": "string" },
+            "duration": {
+              "type": "object",
+              "oneOf": [
+                { "$ref": "../defs/duration.schema.json#/properties/DurationMinutes" },
+                {
+                  "type": "object",
+                  "properties": {
+                    "minMinutes": { "type": "number", "exclusiveMinimum": 0 },
+                    "maxMinutes": { "type": "number", "exclusiveMinimum": 0 }
+                  },
+                  "required": ["minMinutes", "maxMinutes"],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "completionCue": { "type": "string" }
+          },
+          "required": ["activity", "duration"],
+          "additionalProperties": false
+        },
+        "techniqueIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "temperature": { "$ref": "../defs/temperature.schema.json" },
+        "images": {
+          "type": "array",
+          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
+        },
+        "videos": {
+          "type": "array",
+          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
+        }
+      },
+      "required": ["id", "text", "timing"],
+      "additionalProperties": false
+    },
+    "timedStepSection": {
+      "type": "object",
+      "properties": {
+        "section": { "type": "string" },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/timedStep" }
+        }
+      },
+      "required": ["section", "steps"],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soustack.spec/stacks/structured.schema.json",
+  "title": "Structured Stack",
+  "type": "object",
+  "properties": {
+    "instructions": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/step" },
+          { "$ref": "#/$defs/stepSection" }
+        ]
+      }
+    }
+  },
+  "required": ["instructions"],
+  "$defs": {
+    "step": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "dependsOn": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "temperature": { "$ref": "../defs/temperature.schema.json" },
+        "techniqueIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "images": {
+          "type": "array",
+          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
+        },
+        "videos": {
+          "type": "array",
+          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
+        }
+      },
+      "required": ["id", "text"],
+      "additionalProperties": false
+    },
+    "stepSection": {
+      "type": "object",
+      "properties": {
+        "section": { "type": "string" },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/step" }
+        }
+      },
+      "required": ["section", "steps"],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

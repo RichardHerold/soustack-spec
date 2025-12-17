@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "level": "base",
+  "stacks": ["structured", "timed"],
+  "name": "Bad Range",
+  "yield": { "amount": 2, "unit": "servings" },
+  "time": { "total": { "minutes": 15 } },
+  "ingredients": ["water"],
+  "instructions": [
+    {
+      "id": "s1",
+      "text": "Wait",
+      "timing": { "activity": "rest", "duration": { "minMinutes": 10, "maxMinutes": 5 } }
+    }
+  ]
+}

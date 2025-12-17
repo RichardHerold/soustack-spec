@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "level": "lite",
+  "stacks": ["storage"],
+  "name": "Leftover Soup",
+  "ingredients": ["soup"],
+  "instructions": ["reheat when ready"],
+  "storage": {
+    "refrigerated": { "duration": { "iso8601": "P3D" } }
+  }
+}
