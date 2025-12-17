@@ -5,8 +5,12 @@
   "type": "object",
   "properties": {
     "amount": { "type": "number" },
-    "unit": { "type": "string", "minLength": 1 }
+    "unit": { "type": "string", "minLength": 1 },
+    "metadata": { "type": "object", "additionalProperties": true }
   },
   "required": ["amount", "unit"],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "patternProperties": {
+    "^x-": { "$ref": "./common.schema.json#/properties/extensionLaneValue" }
+  }
 }

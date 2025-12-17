@@ -21,56 +21,41 @@
   ],
   "$defs": {
     "timedStep": {
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "text": { "type": "string" },
-        "dependsOn": {
-          "type": "array",
-          "items": { "type": "string" },
-          "uniqueItems": true
-        },
-        "timing": {
-          "type": "object",
+      "allOf": [
+        { "$ref": "../defs/entities.schema.json#/$defs/StepBase" },
+        {
           "properties": {
-            "activity": { "type": "string" },
-            "duration": {
+            "timing": {
               "type": "object",
-              "oneOf": [
-                { "$ref": "../defs/duration.schema.json#/properties/DurationMinutes" },
-                {
+              "properties": {
+                "activity": { "type": "string", "enum": ["active", "passive"] },
+                "duration": {
                   "type": "object",
-                  "properties": {
-                    "minMinutes": { "type": "number", "exclusiveMinimum": 0 },
-                    "maxMinutes": { "type": "number", "exclusiveMinimum": 0 }
-                  },
-                  "required": ["minMinutes", "maxMinutes"],
-                  "additionalProperties": false
-                }
-              ]
-            },
-            "completionCue": { "type": "string" }
+                  "oneOf": [
+                    { "$ref": "../defs/duration.schema.json#/properties/DurationMinutes" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minMinutes": { "type": "number", "exclusiveMinimum": 0 },
+                        "maxMinutes": { "type": "number", "exclusiveMinimum": 0 }
+                      },
+                      "required": ["minMinutes", "maxMinutes"],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "completionCue": { "type": "string" }
+              },
+              "anyOf": [
+                { "required": ["duration"] },
+                { "required": ["completionCue"] }
+              ],
+              "additionalProperties": false
+            }
           },
-          "required": ["activity", "duration"],
-          "additionalProperties": false
-        },
-        "techniqueIds": {
-          "type": "array",
-          "items": { "type": "string" },
-          "uniqueItems": true
-        },
-        "temperature": { "$ref": "../defs/temperature.schema.json" },
-        "images": {
-          "type": "array",
-          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
-        },
-        "videos": {
-          "type": "array",
-          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
+          "required": ["id", "timing"]
         }
-      },
-      "required": ["id", "text", "timing"],
-      "additionalProperties": false
+      ]
     },
     "timedStepSection": {
       "type": "object",
@@ -79,10 +64,14 @@
         "steps": {
           "type": "array",
           "items": { "$ref": "#/$defs/timedStep" }
-        }
+        },
+        "metadata": { "type": "object", "additionalProperties": true }
       },
       "required": ["section", "steps"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+      }
     }
   }
 }

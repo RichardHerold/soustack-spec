@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "base",
   "stacks": ["quantified", "structured", "timed", "referenced", "compute", "temperature", "storage", "dietary", "substitutions", "techniques", "illustrated"],
   "name": "Garlic Pasta",
@@ -13,7 +13,7 @@
     {
       "id": "s1",
       "text": "Boil water",
-      "timing": { "activity": "boil", "duration": { "minutes": 10 } },
+      "timing": { "activity": "active", "duration": { "minutes": 10 } },
       "inputs": ["i1"],
       "techniqueIds": ["t1"],
       "images": ["http://example.com/step1.jpg"]
@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "text": "Cook pasta",
-      "timing": { "activity": "cook", "duration": { "minMinutes": 8, "maxMinutes": 10 } },
+      "timing": { "activity": "active", "duration": { "minMinutes": 8, "maxMinutes": 10 } },
       "dependsOn": ["s1"],
       "inputs": ["i1"],
       "techniqueIds": ["t2"],
@@ -31,7 +31,7 @@
     {
       "id": "s3",
       "text": "Saute garlic",
-      "timing": { "activity": "saute", "duration": { "minutes": 5 }, "completionCue": "fragrant" },
+      "timing": { "activity": "active", "duration": { "minutes": 5 }, "completionCue": "fragrant" },
       "dependsOn": ["s2"],
       "inputs": ["i2"],
       "techniqueIds": ["t1", "t3"],
@@ -56,6 +56,6 @@
     { "id": "t3", "name": "Saute" }
   ],
   "temperatures": [
-    { "target": "oven", "level": "medium", "degreesFahrenheit": 350 }
+    { "target": "oven", "unit": "fahrenheit", "value": 350 }
   ]
 }

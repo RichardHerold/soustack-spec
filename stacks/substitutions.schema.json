@@ -16,16 +16,24 @@
               "type": "object",
               "properties": {
                 "name": { "type": "string" },
-                "ratio": { "type": "string" }
+                "ratio": { "type": "string" },
+                "metadata": { "type": "object", "additionalProperties": true }
               },
               "required": ["name", "ratio"],
-              "additionalProperties": false
+              "additionalProperties": false,
+              "patternProperties": {
+                "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+              }
             },
             "minItems": 1
-          }
+          },
+          "metadata": { "type": "object", "additionalProperties": true }
         },
         "required": ["for", "alternatives"],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "patternProperties": {
+          "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+        }
       },
       "minItems": 1
     }

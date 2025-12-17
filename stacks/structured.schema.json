@@ -17,32 +17,10 @@
   "required": ["instructions"],
   "$defs": {
     "step": {
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "text": { "type": "string" },
-        "dependsOn": {
-          "type": "array",
-          "items": { "type": "string" },
-          "uniqueItems": true
-        },
-        "temperature": { "$ref": "../defs/temperature.schema.json" },
-        "techniqueIds": {
-          "type": "array",
-          "items": { "type": "string" },
-          "uniqueItems": true
-        },
-        "images": {
-          "type": "array",
-          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
-        },
-        "videos": {
-          "type": "array",
-          "items": { "$ref": "../defs/common.schema.json#/properties/uri" }
-        }
-      },
-      "required": ["id", "text"],
-      "additionalProperties": false
+      "allOf": [
+        { "$ref": "../defs/entities.schema.json#/$defs/StepBase" },
+        { "required": ["id"] }
+      ]
     },
     "stepSection": {
       "type": "object",
@@ -51,10 +29,14 @@
         "steps": {
           "type": "array",
           "items": { "$ref": "#/$defs/step" }
-        }
+        },
+        "metadata": { "type": "object", "additionalProperties": true }
       },
       "required": ["section", "steps"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+      }
     }
   },
   "additionalProperties": false

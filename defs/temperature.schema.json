@@ -3,18 +3,61 @@
   "$id": "https://soustack.spec/defs/temperature.schema.json",
   "title": "Temperature",
   "type": "object",
-  "properties": {
-    "target": {
-      "type": "string",
-      "enum": ["oven", "stovetop", "pan", "oil", "water", "grill", "broiler", "internal", "ambient", "surface"]
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string",
+          "enum": ["oven", "stovetop", "pan", "oil", "water", "grill", "broiler", "internal", "ambient", "surface"]
+        },
+        "level": {
+          "type": "string",
+          "enum": ["veryLow", "low", "medium", "mediumHigh", "high", "veryHigh"]
+        },
+        "metadata": { "type": "object", "additionalProperties": true }
+      },
+      "required": ["target", "level"],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "./common.schema.json#/properties/extensionLaneValue" }
+      }
     },
-    "level": {
-      "type": "string",
-      "enum": ["veryLow", "low", "medium", "mediumHigh", "high", "veryHigh"]
+    {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string",
+          "enum": ["oven", "stovetop", "pan", "oil", "water", "grill", "broiler", "internal", "ambient", "surface"]
+        },
+        "unit": { "type": "string", "enum": ["celsius", "fahrenheit"] },
+        "value": { "type": "number" },
+        "approximate": { "type": "boolean" },
+        "metadata": { "type": "object", "additionalProperties": true }
+      },
+      "required": ["target", "unit", "value"],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "./common.schema.json#/properties/extensionLaneValue" }
+      }
     },
-    "degreesCelsius": { "type": "number" },
-    "degreesFahrenheit": { "type": "number" }
-  },
-  "required": ["target"],
-  "additionalProperties": false
+    {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string",
+          "enum": ["oven", "stovetop", "pan", "oil", "water", "grill", "broiler", "internal", "ambient", "surface"]
+        },
+        "unit": { "type": "string", "enum": ["celsius", "fahrenheit"] },
+        "minValue": { "type": "number" },
+        "maxValue": { "type": "number" },
+        "metadata": { "type": "object", "additionalProperties": true }
+      },
+      "required": ["target", "unit", "minValue", "maxValue"],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "./common.schema.json#/properties/extensionLaneValue" }
+      }
+    }
+  ]
 }
