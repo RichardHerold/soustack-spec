@@ -1,0 +1,20 @@
+{
+  "$schema": "https://soustack.spec/soustack.schema.json",
+  "level": "base",
+  "stacks": ["quantified@1", "scaling@1"],
+  "name": "Bad Baker Percent",
+  "yield": { "amount": 1, "unit": "batch" },
+  "time": { "total": { "minutes": 20 } },
+  "ingredients": [
+    {
+      "id": "salt",
+      "name": "Salt",
+      "quantity": { "amount": 10, "unit": "g" },
+      "bakersPercentage": { "of": "missing", "percent": 2 }
+    }
+  ],
+  "instructions": ["combine"],
+  "scaling": {
+    "discrete": { "min": 2, "max": 6 }
+  }
+}

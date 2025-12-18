@@ -176,9 +176,10 @@ Stacks that impose no additional structural or semantic requirements are not per
 * `level` MUST be `base`.
 * `stacks[]` MUST include `quantified@1` and `scaling@1`.
 
-**Status**
+**Semantic Requirements**
 
-* `scaling@1` is reserved for a future revision.
+* Baker's percentage references MUST resolve to declared ingredient ids.
+* Discrete scaling ranges MUST have `min` less than or equal to `max`.
 
 ---
 

@@ -63,7 +63,8 @@
     "dietary": { "$ref": "./stacks/dietary.schema.json#/properties/dietary" },
     "storage": { "$ref": "./stacks/storage.schema.json#/properties/storage" },
     "substitutions": { "$ref": "./stacks/substitutions.schema.json#/properties/substitutions" },
-    "techniques": { "$ref": "./stacks/techniques.schema.json#/properties/techniques" }
+    "techniques": { "$ref": "./stacks/techniques.schema.json#/properties/techniques" },
+    "scaling": { "$ref": "./stacks/scaling.schema.json#/properties/scaling" }
   },
   "patternProperties": {
     "^x-": { "$ref": "./defs/common.schema.json#/properties/extensionLaneValue" }
@@ -75,7 +76,16 @@
       "then": { "required": ["yield", "time"] }
     },
     {
-      "if": { "properties": { "stacks": { "contains": { "const": "quantified" } } } },
+      "if": {
+        "properties": {
+          "stacks": {
+            "allOf": [
+              { "contains": { "enum": ["quantified", "quantified@1"] } },
+              { "not": { "contains": { "enum": ["scaling", "scaling@1"] } } }
+            ]
+          }
+        }
+      },
       "then": {
         "properties": {
           "ingredients": { "$ref": "./stacks/quantified.schema.json#/properties/ingredients" }
@@ -84,7 +94,7 @@
       }
     },
     {
-      "if": { "properties": { "stacks": { "contains": { "const": "structured" } } } },
+      "if": { "properties": { "stacks": { "contains": { "enum": ["structured", "structured@1"] } } } },
       "then": {
         "properties": {
           "instructions": { "$ref": "./stacks/structured.schema.json#/properties/instructions" }
@@ -92,7 +102,18 @@
       }
     },
     {
-      "if": { "properties": { "stacks": { "contains": { "const": "timed" } } } },
+      "if": { "properties": { "stacks": { "contains": { "enum": ["scaling", "scaling@1"] } } } },
+      "then": {
+        "properties": {
+          "ingredients": { "$ref": "./stacks/scaling.schema.json#/properties/ingredients" },
+          "scaling": { "$ref": "./stacks/scaling.schema.json#/properties/scaling" },
+          "stacks": { "contains": { "enum": ["quantified", "quantified@1"] } }
+        },
+        "required": ["ingredients", "scaling"]
+      }
+    },
+    {
+      "if": { "properties": { "stacks": { "contains": { "enum": ["timed", "timed@1"] } } } },
       "then": {
         "properties": {
           "instructions": { "$ref": "./stacks/timed.schema.json#/properties/instructions" }
@@ -100,7 +121,7 @@
       }
     },
     {
-      "if": { "properties": { "stacks": { "contains": { "const": "referenced" } } } },
+      "if": { "properties": { "stacks": { "contains": { "enum": ["referenced", "referenced@1"] } } } },
       "then": {
         "properties": {
           "ingredients": { "$ref": "./stacks/referenced.schema.json#/properties/ingredients" },
@@ -110,33 +131,33 @@
       }
     },
     {
-      "if": { "properties": { "stacks": { "contains": { "const": "compute" } } } },
+      "if": { "properties": { "stacks": { "contains": { "enum": ["compute", "compute@1"] } } } },
       "then": {
         "properties": {
           "level": { "const": "base" },
           "stacks": {
             "allOf": [
-              { "contains": { "const": "quantified" } },
-              { "contains": { "const": "timed" } }
+              { "contains": { "enum": ["quantified", "quantified@1"] } },
+              { "contains": { "enum": ["timed", "timed@1"] } }
             ]
           }
         }
       }
     },
     {
-      "if": { "properties": { "stacks": { "contains": { "const": "storage" } } } },
+      "if": { "properties": { "stacks": { "contains": { "enum": ["storage", "storage@1"] } } } },
       "then": { "required": ["storage"] }
     },
     {
-      "if": { "properties": { "stacks": { "contains": { "const": "dietary" } } } },
+      "if": { "properties": { "stacks": { "contains": { "enum": ["dietary", "dietary@1"] } } } },
       "then": { "required": ["dietary"] }
     },
     {
-      "if": { "properties": { "stacks": { "contains": { "const": "substitutions" } } } },
+      "if": { "properties": { "stacks": { "contains": { "enum": ["substitutions", "substitutions@1"] } } } },
       "then": { "required": ["substitutions"] }
     },
     {
-      "if": { "properties": { "stacks": { "contains": { "const": "techniques" } } } },
+      "if": { "properties": { "stacks": { "contains": { "enum": ["techniques", "techniques@1"] } } } },
       "then": { "required": ["techniques"] }
     }
   ],

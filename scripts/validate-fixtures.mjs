@@ -37,6 +37,17 @@ async function walk(dir) {
   return files;
 }
 
+function normalizeStacks(list = []) {
+  const set = new Set();
+  for (const entry of list) {
+    if (typeof entry !== 'string') continue;
+    set.add(entry);
+    const base = entry.split('@')[0];
+    set.add(base);
+  }
+  return set;
+}
+
 function collectIngredients(ingredients = []) {
   const list = [];
   for (const item of ingredients) {
@@ -119,7 +130,7 @@ function validateDAG(steps) {
 
 function checkConformance(data, file) {
   const errors = [];
-  const stacks = new Set(data.stacks || []);
+  const stacks = normalizeStacks(data.stacks || []);
   const ingredients = collectIngredients(data.ingredients);
   const steps = collectSteps(data.instructions);
 
@@ -173,6 +184,23 @@ function checkConformance(data, file) {
   if (stacks.has('compute')) {
     if (data.level !== 'base' || !stacks.has('quantified') || !stacks.has('timed')) {
       errors.push('compute stack requires base level with quantified and timed stacks');
+    }
+  }
+
+  if (stacks.has('scaling')) {
+    const ingredientIds = new Set(ingredients.map((i) => i.id));
+    for (const ingredient of ingredients) {
+      const bp = ingredient?.bakersPercentage;
+      if (bp && (!bp.of || !ingredientIds.has(bp.of))) {
+        errors.push(`bakersPercentage of references missing ingredient id: ${bp.of || ''}`.trim());
+      }
+    }
+
+    const discrete = data.scaling?.discrete;
+    if (discrete && typeof discrete === 'object') {
+      if (discrete.min > discrete.max) {
+        errors.push('scaling discrete min must be <= max');
+      }
     }
   }
 
