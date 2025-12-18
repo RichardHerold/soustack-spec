@@ -10,7 +10,7 @@
       "id": "starter",
       "name": "Starter",
       "quantity": { "amount": 150, "unit": "g" },
-      "bakersPercentage": { "of": "flour", "percent": 30 }
+      "scaling": { "mode": "bakersPercent", "percent": 30, "of": "flour" }
     }
   ],
   "instructions": ["mix"],
