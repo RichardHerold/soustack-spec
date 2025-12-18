@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { readdir, readFile } from 'node:fs/promises';
 import { join, extname } from 'node:path';
-import Ajv from 'ajv';
+import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
-const ajv = new Ajv({ strict: false, allErrors: true, allowUnionTypes: true });
+const ajv = new Ajv2020({ strict: false, allErrors: true, allowUnionTypes: true });
 addFormats(ajv);
 
 async function loadSchemas() {

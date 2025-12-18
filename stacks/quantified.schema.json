@@ -19,12 +19,7 @@
     "ingredient": {
       "allOf": [
         { "$ref": "../defs/entities.schema.json#/$defs/IngredientBase" },
-        {
-          "properties": {
-            "temperature": { "$ref": "../defs/temperature.schema.json" }
-          },
-          "required": ["id", "quantity"]
-        }
+        { "required": ["id", "quantity"] }
       ]
     },
     "ingredientSection": {
