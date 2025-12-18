@@ -66,7 +66,30 @@ function generateStackGating(registry) {
     const requires = stack.requires || [];
 
     // Build if condition: stack present with correct major + all required stacks
-    const ifCondition = buildStackCondition(stackId, latestMajor, requires);
+    let ifCondition = buildStackCondition(stackId, latestMajor, requires);
+
+    // Special case: quantified should NOT apply when scaling is present
+    // (scaling includes quantified, so we don't want both rules to apply)
+    if (stackId === 'quantified') {
+      ifCondition = {
+        allOf: [
+          ifCondition,
+          {
+            not: {
+              required: ['stacks'],
+              properties: {
+                stacks: {
+                  required: ['scaling'],
+                  properties: {
+                    scaling: { const: 1 }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      };
+    }
 
     // Build then clause from schema paths
     const schemaInfo = STACK_SCHEMA_PATHS[stackId] || {};

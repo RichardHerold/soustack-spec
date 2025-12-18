@@ -325,21 +325,44 @@
     },
     {
       "if": {
-        "required": [
-          "stacks"
-        ],
-        "properties": {
-          "stacks": {
+        "allOf": [
+          {
             "required": [
-              "quantified"
+              "stacks"
             ],
             "properties": {
-              "quantified": {
-                "const": 1
+              "stacks": {
+                "required": [
+                  "quantified"
+                ],
+                "properties": {
+                  "quantified": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "stacks"
+              ],
+              "properties": {
+                "stacks": {
+                  "required": [
+                    "scaling"
+                  ],
+                  "properties": {
+                    "scaling": {
+                      "const": 1
+                    }
+                  }
+                }
               }
             }
           }
-        }
+        ]
       },
       "then": {
         "properties": {

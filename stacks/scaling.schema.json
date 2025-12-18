@@ -42,16 +42,21 @@
   "required": ["ingredients", "scaling"],
   "$defs": {
     "ingredient": {
-      "allOf": [
-        { "$ref": "../defs/ingredientQuantified.schema.json" },
-        {
-          "type": "object",
-          "properties": {
-            "scaling": { "$ref": "../defs/scalingRule.schema.json" }
-          }
-        }
-      ],
-      "unevaluatedProperties": false
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "quantity": { "$ref": "../defs/quantity.schema.json" },
+        "temperature": { "$ref": "../defs/temperature.schema.json" },
+        "notes": { "type": "string" },
+        "metadata": { "type": "object", "additionalProperties": true },
+        "scaling": { "$ref": "../defs/scalingRule.schema.json" }
+      },
+      "required": ["id", "name", "quantity"],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+      }
     },
     "ingredientSection": {
       "type": "object",
