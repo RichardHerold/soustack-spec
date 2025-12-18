@@ -8,13 +8,6 @@ const forbiddenPaths = [
   'schemas/registry'
 ];
 
-const forbiddenTerms = [
-  'cookable',
-  'schedulable',
-  'scalable profile',
-  'profiles/quantified'
-];
-
 async function pathExists(target) {
   try {
     await stat(target);
