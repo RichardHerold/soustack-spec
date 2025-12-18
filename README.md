@@ -75,14 +75,13 @@ Profiles are defined normatively in **SPEC.md**.
 | ----------------------------- | -------------------------------------- |
 | Lite                          | Lowest-friction publishing             |
 | Base                          | Minimum cookable baseline              |
-| Illustrated                   | Images suitable for embeds             |
 | Structured                    | Stable IDs and sections                |
 | Referenced                    | Steps explicitly reference ingredients |
 | Timed                         | Step-level timing                      |
 | Schedulable                   | Dependency graph + timing              |
 | Quantified                    | Machine-readable quantities            |
 | Scalable                      | Interoperable scaling rules            |
-| Nutrition / Dietary / Storage | Optional enrichment                    |
+| Illustrated/ Nutrition / Dietary / Storage | Optional enrichment                    |
 
 ---
 
