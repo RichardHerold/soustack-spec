@@ -1,0 +1,416 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/SPEC.md b/SPEC.md
+index fc8f3c9d129c21d0d9b4faca600a619e2d63ac0f..f2f823b8638f504f6d9da23a648a4d94d0271800 100644
+--- a/SPEC.md
++++ b/SPEC.md
+@@ -20,53 +20,54 @@ This document is **normative** unless otherwise noted.
+ ## 2. Terminology
+ 
+ * **Document**: A JSON object conforming to the Soustack root schema.
+ * **Level**: A baseline classification (`lite` or `base`) defining minimum required structure.
+ * **Profile**: A named, human-facing conformance target describing what a consumer may rely on.
+ * **Stack**: A declared capability that activates additional structural and/or semantic requirements.
+ * **Conformance**: Passing both schema validation and all required semantic checks.
+ * **Badge**: A derived, informative label emitted by tooling based on observed conformance.
+ 
+ ---
+ 
+ ## 3. Profiles (Normative)
+ 
+ Profiles are the **primary public contract** of the Soustack specification.
+ 
+ A Profile defines a bundle of requirements expressed in terms of:
+ 
+ * required `level`
+ * required `stacks`
+ * required semantic validation rules
+ 
+ Profiles support an **adoption ladder**: publishers may start with minimal structure and progressively add capabilities without changing the overall document shape.
+ 
+ ### 3.1 Profile Declaration
+ 
+-A document MAY declare a profile explicitly using a top-level `profile` field. Tools MAY also infer the profile from `level` and `stacks`.
+-
+-If a document declares both a `profile` and explicit `level`/`stacks`, they MUST NOT contradict. Contradictions MUST be treated as non-conformant.
++* A document MAY declare a profile explicitly using a top-level `profile` field. The field is OPTIONAL; omission MUST NOT change document validity.
++* Tools MAY infer the profile from `level` and `stacks` when `profile` is absent.
++* `profile` is a single primary claim (no arrays or multi-profile declarations).
++* If a document declares both a `profile` and explicit `level`/`stacks`, they MUST NOT contradict. Contradictions MUST be treated as non-conformant.
+ 
+ ### 3.2 Stack Semantics
+ 
+ If a document declares a stack in `stacks[]`, it MUST satisfy all requirements of that stack as defined by this specification.
+ 
+ Stacks that impose no additional structural or semantic requirements are not permitted in future major versions.
+ 
+ ---
+ 
+ ## 4. Profile Definitions
+ 
+ ### Profile: Lite
+ 
+ **Purpose:** Lowest-friction publishing and ingestion.
+ 
+ **Requirements**
+ 
+ * `level` MUST be `lite`.
+ 
+ **Guarantees**
+ 
+ * Valid Soustack container structure.
+ * Ingredients and instructions MAY be unstructured strings.
+ 
+ ---
+diff --git a/fixtures/profile/profile-base.valid.json b/fixtures/profile/profile-base.valid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..850f8903aea3cd3b696ad18cdf253b1b3ce51348
+--- /dev/null
++++ b/fixtures/profile/profile-base.valid.json
+@@ -0,0 +1,10 @@
++{
++  "level": "base",
++  "profile": "base",
++  "stacks": [],
++  "name": "Boiled Egg",
++  "yield": { "amount": 1, "unit": "serving" },
++  "time": { "total": { "minutes": 10 } },
++  "ingredients": ["Egg"],
++  "instructions": ["Boil the egg for 10 minutes."]
++}
+diff --git a/fixtures/profile/profile-lite-wrong-level.invalid.json b/fixtures/profile/profile-lite-wrong-level.invalid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..116c3f655c89c9b02144a97fc16b80e6af5956f2
+--- /dev/null
++++ b/fixtures/profile/profile-lite-wrong-level.invalid.json
+@@ -0,0 +1,10 @@
++{
++  "level": "base",
++  "profile": "lite",
++  "stacks": [],
++  "name": "Mismatched Profile",
++  "yield": { "amount": 1, "unit": "serving" },
++  "time": { "total": { "minutes": 5 } },
++  "ingredients": ["Ingredient"],
++  "instructions": ["Do something simple."]
++}
+diff --git a/fixtures/profile/profile-lite.valid.json b/fixtures/profile/profile-lite.valid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..f284d0c8324fb0b5455c9444ecf730025c491690
+--- /dev/null
++++ b/fixtures/profile/profile-lite.valid.json
+@@ -0,0 +1,8 @@
++{
++  "level": "lite",
++  "profile": "lite",
++  "stacks": [],
++  "name": "Simple Toast",
++  "ingredients": ["Bread", "Butter"],
++  "instructions": ["Toast the bread.", "Spread butter on toast."]
++}
+diff --git a/fixtures/profile/profile-scalable-missing-scaling.invalid.json b/fixtures/profile/profile-scalable-missing-scaling.invalid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..4f1b329afae8d26e5b2c2174ccbf872f826b63ab
+--- /dev/null
++++ b/fixtures/profile/profile-scalable-missing-scaling.invalid.json
+@@ -0,0 +1,16 @@
++{
++  "level": "base",
++  "profile": "scalable",
++  "stacks": ["quantified@1"],
++  "name": "Scaled Bread",
++  "yield": { "amount": 2, "unit": "loaf" },
++  "time": { "total": { "minutes": 180 } },
++  "ingredients": [
++    {
++      "id": "flour",
++      "name": "Bread flour",
++      "quantity": { "amount": 500, "unit": "g" }
++    }
++  ],
++  "instructions": ["Mix ingredients."]
++}
+diff --git a/fixtures/profile/profile-scalable.valid.json b/fixtures/profile/profile-scalable.valid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..b8800523f39af613d3aca93d70b647f75068f70d
+--- /dev/null
++++ b/fixtures/profile/profile-scalable.valid.json
+@@ -0,0 +1,30 @@
++{
++  "level": "base",
++  "profile": "scalable",
++  "stacks": ["quantified@1", "scaling@1"],
++  "name": "Scaled Bread",
++  "yield": { "amount": 2, "unit": "loaf" },
++  "time": { "total": { "minutes": 180 } },
++  "ingredients": [
++    {
++      "id": "flour",
++      "name": "Bread flour",
++      "quantity": { "amount": 500, "unit": "g" }
++    },
++    {
++      "id": "water",
++      "name": "Water",
++      "quantity": { "amount": 325, "unit": "g" }
++    }
++  ],
++  "scaling": {
++    "discrete": { "min": 1, "max": 5, "step": 1 }
++  },
++  "instructions": [
++    {
++      "text": "Combine ingredients and knead until smooth.",
++      "dependsOn": [],
++      "id": "step-1"
++    }
++  ]
++}
+diff --git a/fixtures/profile/profile-timed-missing-structured.invalid.json b/fixtures/profile/profile-timed-missing-structured.invalid.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..f1753d5b752445955c66ba28552779ae7046011d
+--- /dev/null
++++ b/fixtures/profile/profile-timed-missing-structured.invalid.json
+@@ -0,0 +1,16 @@
++{
++  "level": "base",
++  "profile": "timed",
++  "stacks": ["timed@1"],
++  "name": "Timed Roast",
++  "yield": { "amount": 4, "unit": "servings" },
++  "time": { "total": { "minutes": 90 } },
++  "ingredients": ["Beef"],
++  "instructions": [
++    {
++      "id": "step-1",
++      "text": "Roast until done",
++      "timing": { "duration": { "minutes": 90 } }
++    }
++  ]
++}
+diff --git a/soustack.schema.json b/soustack.schema.json
+index 3b748b0b6da97ce330827664a67b059253ac3d09..71c87a0734b682ac8edcc064dba645b403d8139e 100644
+--- a/soustack.schema.json
++++ b/soustack.schema.json
+@@ -1,33 +1,50 @@
+ {
+   "$schema": "https://json-schema.org/draft/2020-12/schema",
+   "$id": "https://soustack.spec/soustack.schema.json",
+   "title": "Soustack Specification",
+   "type": "object",
+   "properties": {
+     "$schema": { "type": "string", "const": "https://soustack.spec/soustack.schema.json" },
+     "level": { "type": "string", "enum": ["lite", "base"] },
++    "profile": {
++      "type": "string",
++      "enum": [
++        "lite",
++        "base",
++        "structured",
++        "referenced",
++        "timed",
++        "schedulable",
++        "quantified",
++        "scalable",
++        "illustrated",
++        "nutrition",
++        "dietary",
++        "storage"
++      ]
++    },
+     "stacks": {
+       "type": "array",
+       "items": { "$ref": "./defs/common.schema.json#/properties/stackId" },
+       "uniqueItems": true
+     },
+     "name": { "type": "string" },
+     "yield": {
+       "type": "object",
+       "properties": {
+         "amount": { "type": "number", "exclusiveMinimum": 0 },
+         "unit": { "type": "string", "minLength": 1 },
+         "metadata": { "type": "object", "additionalProperties": true }
+       },
+       "required": ["amount", "unit"],
+       "additionalProperties": false,
+       "patternProperties": {
+         "^x-": { "$ref": "./defs/common.schema.json#/properties/extensionLaneValue" }
+       }
+     },
+     "time": {
+       "type": "object",
+       "properties": {
+         "total": { "$ref": "./defs/duration.schema.json#/properties/DurationMinutes" },
+         "metadata": { "type": "object", "additionalProperties": true }
+       },
+@@ -137,50 +154,168 @@
+           "level": { "const": "base" },
+           "stacks": {
+             "allOf": [
+               { "contains": { "enum": ["quantified", "quantified@1"] } },
+               { "contains": { "enum": ["timed", "timed@1"] } }
+             ]
+           }
+         }
+       }
+     },
+     {
+       "if": { "properties": { "stacks": { "contains": { "enum": ["storage", "storage@1"] } } } },
+       "then": { "required": ["storage"] }
+     },
+     {
+       "if": { "properties": { "stacks": { "contains": { "enum": ["dietary", "dietary@1"] } } } },
+       "then": { "required": ["dietary"] }
+     },
+     {
+       "if": { "properties": { "stacks": { "contains": { "enum": ["substitutions", "substitutions@1"] } } } },
+       "then": { "required": ["substitutions"] }
+     },
+     {
+       "if": { "properties": { "stacks": { "contains": { "enum": ["techniques", "techniques@1"] } } } },
+       "then": { "required": ["techniques"] }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "lite" } } },
++      "then": { "properties": { "level": { "const": "lite" } } }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "base" } } },
++      "then": { "properties": { "level": { "const": "base" } } }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "structured" } } },
++      "then": {
++        "properties": {
++          "level": { "const": "base" },
++          "stacks": { "contains": { "enum": ["structured", "structured@1"] } }
++        }
++      }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "referenced" } } },
++      "then": {
++        "properties": {
++          "level": { "const": "base" },
++          "stacks": {
++            "allOf": [
++              { "contains": { "enum": ["structured", "structured@1"] } },
++              { "contains": { "enum": ["referenced", "referenced@1"] } }
++            ]
++          }
++        }
++      }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "timed" } } },
++      "then": {
++        "properties": {
++          "level": { "const": "base" },
++          "stacks": {
++            "allOf": [
++              { "contains": { "enum": ["structured", "structured@1"] } },
++              { "contains": { "enum": ["timed", "timed@1"] } }
++            ]
++          }
++        }
++      }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "schedulable" } } },
++      "then": {
++        "properties": {
++          "level": { "const": "base" },
++          "stacks": {
++            "allOf": [
++              { "contains": { "enum": ["structured", "structured@1"] } },
++              { "contains": { "enum": ["timed", "timed@1"] } }
++            ]
++          }
++        }
++      }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "quantified" } } },
++      "then": {
++        "properties": {
++          "level": { "const": "base" },
++          "stacks": { "contains": { "enum": ["quantified", "quantified@1"] } }
++        }
++      }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "scalable" } } },
++      "then": {
++        "properties": {
++          "level": { "const": "base" },
++          "stacks": {
++            "allOf": [
++              { "contains": { "enum": ["quantified", "quantified@1"] } },
++              { "contains": { "enum": ["scaling", "scaling@1"] } }
++            ]
++          }
++        }
++      }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "illustrated" } } },
++      "then": {
++        "properties": {
++          "level": { "const": "base" },
++          "stacks": { "contains": { "enum": ["illustrated", "illustrated@1"] } }
++        }
++      }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "nutrition" } } },
++      "then": {
++        "properties": {
++          "level": { "const": "base" },
++          "stacks": { "contains": { "enum": ["nutrition", "nutrition@1"] } }
++        }
++      }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "dietary" } } },
++      "then": {
++        "properties": {
++          "level": { "const": "base" },
++          "stacks": { "contains": { "enum": ["dietary", "dietary@1"] } }
++        }
++      }
++    },
++    {
++      "if": { "required": ["profile"], "properties": { "profile": { "const": "storage" } } },
++      "then": {
++        "properties": {
++          "level": { "const": "base" },
++          "stacks": { "contains": { "enum": ["storage", "storage@1"] } }
++        }
++      }
+     }
+   ],
+   "unevaluatedProperties": false,
+   "$defs": {
+     "ingredient": {
+       "allOf": [
+         { "$ref": "./defs/entities.schema.json#/$defs/IngredientBase" }
+       ]
+     },
+     "ingredientSection": {
+       "type": "object",
+       "properties": {
+         "section": { "type": "string" },
+         "ingredients": {
+           "type": "array",
+           "items": {
+             "anyOf": [
+               { "type": "string" },
+               { "$ref": "#/$defs/ingredient" },
+               { "$ref": "#/$defs/ingredientSection" }
+             ]
+           }
+         },
+         "metadata": { "type": "object", "additionalProperties": true }
+       },
+ 
+EOF
+)
