@@ -18,9 +18,9 @@
   "$defs": {
     "ingredient": {
       "allOf": [
-        { "$ref": "../defs/entities.schema.json#/$defs/IngredientBase" },
-        { "required": ["id", "quantity"] }
-      ]
+        { "$ref": "../defs/ingredientQuantified.schema.json" }
+      ],
+      "unevaluatedProperties": false
     },
     "ingredientSection": {
       "type": "object",

@@ -9,8 +9,9 @@
   },
   "scripts": {
     "guard": "node scripts/guard-no-legacy.mjs",
+    "check-refs": "node scripts/check-schema-refs.mjs",
     "validate": "node scripts/validate-fixtures.mjs",
-    "test": "npm run guard && npm run validate"
+    "test": "npm run guard && npm run check-refs && npm run validate"
   },
   "dependencies": {
     "ajv": "^8.17.1",
