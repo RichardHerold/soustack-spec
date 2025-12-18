@@ -1,241 +1,97 @@
 {
-    "$schema": "https://soustack.dev/schemas/stacks-registry.schema.json",
-    "registryVersion": 1,
-    "spec": {
-      "name": "soustack",
-      "currentSpecVersion": "0.3.0",
-      "canonicalStacksFormat": "map"
+  "$schema": "../schemas/stacks-registry.schema.json",
+  "registryVersion": 1,
+  "spec": {
+    "name": "soustack",
+    "currentSpecVersion": "0.3.0",
+    "canonicalStacksFormat": "map"
+  },
+  "profiles": {
+    "base": { "title": "Base", "description": "name, ingredients, instructions", "requires": [] },
+    "lite": { "title": "Lite", "description": "Minimal publishable recipe", "requires": ["base"] },
+    "scalable": { "title": "Scalable", "description": "Quantified + scaling", "requires": ["lite"] },
+    "timed": { "title": "Timed", "description": "Structured + timed", "requires": ["lite"] },
+    "illustrated": { "title": "Illustrated", "description": "Media present", "requires": ["lite"] }
+  },
+  "stacks": {
+    "quantified": {
+      "title": "Quantified",
+      "latestMajor": 1,
+      "profile": "scalable",
+      "requires": [],
+      "schema": { "major": { "1": "stacks/quantified.schema.json" } }
     },
-  
-    "profiles": {
-      "base": {
-        "title": "Base",
-        "description": "name, ingredients, instructions",
-        "requires": []
-      },
-      "cookable": {
-        "title": "Cookable",
-        "description": "Base + yield + times",
-        "requires": ["base"]
-      },
-      "scalable": {
-        "title": "Scalable",
-        "description": "Cookable + quantified + scaling",
-        "requires": ["cookable"]
-      },
-      "schedulable": {
-        "title": "Schedulable",
-        "description": "Cookable + structured + timed + dependency graph semantics",
-        "requires": ["cookable"]
-      },
-      "illustrated": {
-        "title": "Illustrated",
-        "description": "Cookable + images (hero/step)",
-        "requires": ["cookable"]
-      }
+    "scaling": {
+      "title": "Scaling",
+      "latestMajor": 1,
+      "profile": "scalable",
+      "requires": ["quantified"],
+      "schema": { "major": { "1": "stacks/scaling.schema.json" } },
+      "docs": { "major": { "1": "stacks/scaling@1.md" } }
     },
-  
-    "stacks": {
-      "quantified": {
-        "title": "Quantified",
-        "latestMajor": 1,
-        "profile": "scalable",
-        "requires": [],
-        "schema": {
-          "major": {
-            "1": "stacks/quantified.schema.json"
-          }
-        },
-        "docs": {
-          "major": {
-            "1": "stacks/quantified@1.md"
-          }
-        },
-        "semantics": [
-          "Quantities MAY be absent for 'to taste' items; if present, unit+amount MUST be consistent.",
-          "Ingredient sections remain nestable."
-        ]
-      },
-  
-      "scaling": {
-        "title": "Scaling",
-        "latestMajor": 1,
-        "profile": "scalable",
-        "requires": ["quantified"],
-        "schema": {
-          "major": {
-            "1": "stacks/scaling.schema.json"
-          }
-        },
-        "docs": {
-          "major": {
-            "1": "stacks/scaling@1.md"
-          }
-        },
-        "semantics": [
-          "Scaling rules MUST be deterministic given a scale factor / target yield.",
-          "If a scaling mode depends on another ingredient (e.g., baker’s percent), the referenced ingredient MUST exist and be quantified."
-        ]
-      },
-  
-      "structured": {
-        "title": "Structured Steps",
-        "latestMajor": 1,
-        "profile": "schedulable",
-        "requires": [],
-        "schema": {
-          "major": {
-            "1": "stacks/structured.schema.json"
-          }
-        },
-        "docs": {
-          "major": {
-            "1": "stacks/structured@1.md"
-          }
-        },
-        "semantics": [
-          "Steps MUST be objects with stable ids.",
-          "Step sections remain nestable."
-        ]
-      },
-  
-      "timed": {
-        "title": "Timed Steps",
-        "latestMajor": 1,
-        "profile": "schedulable",
-        "requires": ["structured"],
-        "schema": {
-          "major": {
-            "1": "stacks/timed.schema.json"
-          }
-        },
-        "docs": {
-          "major": {
-            "1": "stacks/timed@1.md"
-          }
-        },
-        "semantics": [
-          "Duration ranges MUST have min <= max.",
-          "Active/passive time semantics MUST be explicit when present."
-        ]
-      },
-  
-      "referenced": {
-        "title": "Ingredient References",
-        "latestMajor": 1,
-        "profile": "schedulable",
-        "requires": ["structured"],
-        "schema": {
-          "major": {
-            "1": "stacks/referenced.schema.json"
-          }
-        },
-        "docs": {
-          "major": {
-            "1": "stacks/referenced@1.md"
-          }
-        },
-        "semantics": [
-          "Any step input reference MUST resolve to an ingredient id.",
-          "Unresolved references are non-conformant."
-        ]
-      },
-  
-      "illustrated": {
-        "title": "Images",
-        "latestMajor": 1,
-        "profile": "illustrated",
-        "requires": [],
-        "schema": {
-          "major": {
-            "1": "stacks/illustrated.schema.json"
-          }
-        },
-        "docs": {
-          "major": {
-            "1": "stacks/illustrated@1.md"
-          }
-        },
-        "semantics": [
-          "At least one media URI MUST be present at recipe or step level."
-        ]
-      },
-  
-      "dietary": {
-        "title": "Dietary Tags",
-        "latestMajor": 1,
-        "profile": "cookable",
-        "requires": [],
-        "schema": {
-          "major": {
-            "1": "stacks/dietary.schema.json"
-          }
-        },
-        "docs": {
-          "major": {
-            "1": "stacks/dietary@1.md"
-          }
-        },
-        "semantics": []
-      },
-  
-      "substitutions": {
-        "title": "Substitutions",
-        "latestMajor": 1,
-        "profile": "cookable",
-        "requires": ["referenced"],
-        "schema": {
-          "major": {
-            "1": "stacks/substitutions.schema.json"
-          }
-        },
-        "docs": {
-          "major": {
-            "1": "stacks/substitutions@1.md"
-          }
-        },
-        "semantics": [
-          "Substitution targets MUST resolve to ingredient ids."
-        ]
-      },
-  
-      "techniques": {
-        "title": "Techniques",
-        "latestMajor": 1,
-        "profile": "cookable",
-        "requires": [],
-        "schema": {
-          "major": {
-            "1": "stacks/techniques.schema.json"
-          }
-        },
-        "docs": {
-          "major": {
-            "1": "stacks/techniques@1.md"
-          }
-        },
-        "semantics": []
-      },
-  
-      "storage": {
-        "title": "Storage",
-        "latestMajor": 1,
-        "profile": "cookable",
-        "requires": [],
-        "schema": {
-          "major": {
-            "1": "stacks/storage.schema.json"
-          }
-        },
-        "docs": {
-          "major": {
-            "1": "stacks/storage@1.md"
-          }
-        },
-        "semantics": [
-          "Storage duration MUST be machine-parseable (e.g., ISO-8601 duration)."
-        ]
-      }
+    "structured": {
+      "title": "Structured",
+      "latestMajor": 1,
+      "profile": "timed",
+      "requires": [],
+      "schema": { "major": { "1": "stacks/structured.schema.json" } }
+    },
+    "timed": {
+      "title": "Timed",
+      "latestMajor": 1,
+      "profile": "timed",
+      "requires": ["structured"],
+      "schema": { "major": { "1": "stacks/timed.schema.json" } }
+    },
+    "referenced": {
+      "title": "Referenced",
+      "latestMajor": 1,
+      "profile": "timed",
+      "requires": ["structured"],
+      "schema": { "major": { "1": "stacks/referenced.schema.json" } }
+    },
+    "illustrated": {
+      "title": "Illustrated",
+      "latestMajor": 1,
+      "profile": "illustrated",
+      "requires": [],
+      "schema": { "major": { "1": "stacks/illustrated.schema.json" } }
+    },
+    "dietary": {
+      "title": "Dietary",
+      "latestMajor": 1,
+      "profile": "lite",
+      "requires": [],
+      "schema": { "major": { "1": "stacks/dietary.schema.json" } }
+    },
+    "substitutions": {
+      "title": "Substitutions",
+      "latestMajor": 1,
+      "profile": "lite",
+      "requires": ["referenced"],
+      "schema": { "major": { "1": "stacks/substitutions.schema.json" } }
+    },
+    "techniques": {
+      "title": "Techniques",
+      "latestMajor": 1,
+      "profile": "lite",
+      "requires": [],
+      "schema": { "major": { "1": "stacks/techniques.schema.json" } }
+    },
+    "storage": {
+      "title": "Storage",
+      "latestMajor": 1,
+      "profile": "lite",
+      "requires": [],
+      "schema": { "major": { "1": "stacks/storage.schema.json" } }
+    },
+    "compute": {
+      "title": "Compute",
+      "latestMajor": 1,
+      "profile": "lite",
+      "requires": ["quantified", "timed"],
+      "schema": { "major": { "1": "stacks/compute.schema.json" } }
     }
   }
+}
   
