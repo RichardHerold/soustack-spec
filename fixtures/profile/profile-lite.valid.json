@@ -1,8 +1,14 @@
 {
   "level": "lite",
   "profile": "lite",
-  "stacks": [],
+  "stacks": {},
   "name": "Simple Toast",
-  "ingredients": ["Bread", "Butter"],
-  "instructions": ["Toast the bread.", "Spread butter on toast."]
+  "ingredients": [
+    "Bread",
+    "Butter"
+  ],
+  "instructions": [
+    "Toast the bread.",
+    "Spread butter on toast."
+  ]
 }

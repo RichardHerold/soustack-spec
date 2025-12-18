@@ -1,15 +1,37 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "base",
-  "stacks": ["quantified@1", "scaling@1"],
+  "stacks": {
+    "quantified": 1,
+    "scaling": 1
+  },
   "name": "Bad Range",
-  "yield": { "amount": 1, "unit": "tray" },
-  "time": { "total": { "minutes": 15 } },
+  "yield": {
+    "amount": 1,
+    "unit": "tray"
+  },
+  "time": {
+    "total": {
+      "minutes": 15
+    }
+  },
   "ingredients": [
-    { "id": "sugar", "name": "Sugar", "quantity": { "amount": 100, "unit": "g" } }
+    {
+      "id": "sugar",
+      "name": "Sugar",
+      "quantity": {
+        "amount": 100,
+        "unit": "g"
+      }
+    }
   ],
-  "instructions": ["stir"],
+  "instructions": [
+    "stir"
+  ],
   "scaling": {
-    "discrete": { "min": 5, "max": 2 }
+    "discrete": {
+      "min": 5,
+      "max": 2
+    }
   }
 }
