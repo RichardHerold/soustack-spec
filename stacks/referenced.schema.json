@@ -32,7 +32,8 @@
       "allOf": [
         { "$ref": "../defs/entities.schema.json#/$defs/IngredientBase" },
         { "required": ["id"] }
-      ]
+      ],
+      "unevaluatedProperties": false
     },
     "ingredientSection": {
       "type": "object",

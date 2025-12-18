@@ -163,7 +163,11 @@
   ],
   "unevaluatedProperties": false,
   "$defs": {
-    "ingredient": { "$ref": "./defs/entities.schema.json#/$defs/IngredientBase" },
+    "ingredient": {
+      "allOf": [
+        { "$ref": "./defs/entities.schema.json#/$defs/IngredientBase" }
+      ]
+    },
     "ingredientSection": {
       "type": "object",
       "properties": {
