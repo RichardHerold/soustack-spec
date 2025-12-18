@@ -1,7 +1,7 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "lite",
-  "stacks": ["structured", "illustrated"],
+  "stacks": ["structured@1", "illustrated@1"],
   "name": "Picture Smoothie",
   "ingredients": ["fruit", "yogurt"],
   "instructions": [

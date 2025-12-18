@@ -1,7 +1,7 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "base",
-  "stacks": ["quantified"],
+  "stacks": ["quantified@1"],
   "name": "Bad Quant",
   "yield": { "amount": 1, "unit": "dish" },
   "time": { "total": { "minutes": 5 } },

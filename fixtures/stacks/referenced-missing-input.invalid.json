@@ -1,7 +1,7 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "base",
-  "stacks": ["structured", "referenced"],
+  "stacks": ["structured@1", "referenced@1"],
   "name": "Missing Input",
   "yield": { "amount": 1, "unit": "dish" },
   "time": { "total": { "minutes": 20 } },
