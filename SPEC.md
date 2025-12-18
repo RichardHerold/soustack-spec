@@ -42,9 +42,10 @@ Profiles support an **adoption ladder**: publishers may start with minimal struc
 
 ### 3.1 Profile Declaration
 
-A document MAY declare a profile explicitly using a top-level `profile` field. Tools MAY also infer the profile from `level` and `stacks`.
-
-If a document declares both a `profile` and explicit `level`/`stacks`, they MUST NOT contradict. Contradictions MUST be treated as non-conformant.
+* A document MAY declare a profile explicitly using a top-level `profile` field. The field is OPTIONAL; omission MUST NOT change document validity.
+* Tools MAY infer the profile from `level` and `stacks` when `profile` is absent.
+* `profile` is a single primary claim (no arrays or multi-profile declarations).
+* If a document declares both a `profile` and explicit `level`/`stacks`, they MUST NOT contradict. Contradictions MUST be treated as non-conformant.
 
 ### 3.2 Stack Semantics
 
