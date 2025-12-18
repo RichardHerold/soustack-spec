@@ -12,7 +12,11 @@
         "frozen": { "$ref": "#/$defs/storageMethod" },
         "metadata": { "type": "object", "additionalProperties": true }
       },
-      "minProperties": 1,
+      "anyOf": [
+        { "required": ["roomTemp"] },
+        { "required": ["refrigerated"] },
+        { "required": ["frozen"] }
+      ],
       "additionalProperties": false,
       "patternProperties": {
         "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }

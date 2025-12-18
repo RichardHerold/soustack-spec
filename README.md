@@ -5,7 +5,7 @@ This repository defines the canonical Soustack specification with a single JSON 
 ## Layout
 - `soustack.schema.json` — canonical schema entrypoint (draft 2020-12)
 - `defs/` — shared primitives (quantity, duration, temperature, common helpers)
-- `stacks/` — stack-specific schema fragments (quantified, structured, timed, referenced, compute claim, temperature, storage, dietary, substitutions, techniques, illustrated)
+- `stacks/` — stack-specific schema fragments (quantified, structured, timed, referenced, compute claim, storage, dietary, substitutions, techniques, illustrated)
 - `fixtures/` — golden fixtures grouped by `level/`, `stacks/`, and `content/`
 - `scripts/` — conformance tooling (`validate-fixtures.mjs`, `guard-no-legacy.mjs`)
 - `.github/workflows/validate.yml` — CI runner

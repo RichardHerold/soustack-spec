@@ -5,9 +5,10 @@
 - **base**: MUST include `yield.amount > 0`, `yield.unit` (non-empty), and `time.total.minutes > 0`. All other lite rules apply.
 
 ## Canonical entrypoint
-- The only schema entrypoint is `soustack.schema.json` (JSON Schema 2020-12). Instance `$schema` is optional; when present it SHOULD be `https://soustack.spec/soustack.schema.json`.
+- The only schema entrypoint is `soustack.schema.json` (JSON Schema 2020-12). Instance `$schema` is optional; when present it MUST be `https://soustack.spec/soustack.schema.json`.
 - Top-level MAY include `metadata` and any `x-*` extension properties. Nested objects (ingredients, steps, sections, techniques, substitutions, storage methods, quantities, durations, etc.) MAY also carry `metadata` and `x-*` lanes while remaining otherwise closed.
-- Optional top-level collections used by stacks: `images`, `videos`, `dietary`, `storage`, `substitutions`, `techniques`, `temperatures`.
+- Optional top-level collections used by stacks: `images`, `videos`, `dietary`, `storage`, `substitutions`, `techniques`.
+- `temperature` is a supported primitive on steps and ingredients; when present it MUST follow the schema’s allowed targets and qualitative or numeric shapes.
 - Stack identifiers are a closed Soustack vocabulary. Future namespacing (for example, `soustack:timed`) remains a compatible option without changing current IDs.
 
 ## Stack rules
@@ -16,7 +17,6 @@
 - **timed**: Extends structured. Each step MUST include `timing.activity` (`active` or `passive`) and EITHER `timing.duration` (exact `minutes` or range `minMinutes` + `maxMinutes` with `min <= max`) OR `timing.completionCue` (or both).
 - **referenced**: Requires structured semantics. Ingredients MUST include `id` and `name` (quantity optional). Steps MUST include `inputs` (string array, min 1) that resolve to ingredient IDs.
 - **compute**: Pure claim. Conformance MUST assert `level=base` with both `quantified` and `timed` stacks (timed already implies structured) and the stack list MUST include those dependencies.
-- **temperature**: When temperature objects appear, they MUST use the `target` enum (`oven`, `stovetop`, `pan`, `oil`, `water`, `grill`, `broiler`, `internal`, `ambient`, `surface`). Temperatures MUST be either qualitative (`target` + `level` from `veryLow`..`veryHigh`), numeric (`target` + `unit` `celsius|fahrenheit` + `value`), or numeric range (`target` + `unit` + `minValue` + `maxValue`). Presence is optional.
 - **storage**: Storage block MUST exist. At least one of `roomTemp`, `refrigerated`, or `frozen` MUST appear. Each method MUST include `duration.iso8601`.
 - **dietary**: Dietary block MUST exist. `basis` MUST be `perServing` or `perRecipe`. At least one signal MUST appear among calories, macros, diets, or allergens.
 - **substitutions**: `substitutions` MUST be non-empty. Each entry MUST include `for` and `alternatives[]`. Each alternative MUST include `name` and `ratio`.
