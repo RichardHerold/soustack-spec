@@ -61,6 +61,16 @@ function collectSteps(instructions = []) {
   return steps;
 }
 
+function validateTemperatureRange(temp, context) {
+  if (!temp || typeof temp !== 'object') return null;
+  if ('minValue' in temp && 'maxValue' in temp) {
+    if (!(temp.minValue <= temp.maxValue)) {
+      return `${context} temperature minValue must be <= maxValue`;
+    }
+  }
+  return null;
+}
+
 function uniqueCheck(items, key, label) {
   const seen = new Set();
   for (const item of items) {
@@ -112,6 +122,15 @@ function checkConformance(data, file) {
   const stacks = new Set(data.stacks || []);
   const ingredients = collectIngredients(data.ingredients);
   const steps = collectSteps(data.instructions);
+
+  for (const ingredient of ingredients) {
+    const issue = validateTemperatureRange(ingredient.temperature, 'ingredient');
+    if (issue) errors.push(issue);
+  }
+  for (const step of steps) {
+    const issue = validateTemperatureRange(step.temperature, `step ${step.id || ''}`.trim());
+    if (issue) errors.push(issue);
+  }
 
   if (ingredients.length) {
     const dup = uniqueCheck(ingredients, 'id', 'ingredient');

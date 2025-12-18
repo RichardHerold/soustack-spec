@@ -11,10 +11,10 @@
   
     "hard_rules": [
       "DO NOT add new schema fields, enums, or definitions without explicit instruction.",
-      "DO NOT rename existing fields, definitions, profiles, or files unless explicitly requested.",
+      "DO NOT rename existing fields, definitions, levels, or files unless explicitly requested.",
       "DO NOT loosen validation rules silently (e.g. removing required fields, changing types).",
       "DO NOT add vendor-specific logic, heuristics, or runtime behavior.",
-      "DO NOT invent new profile levels or reinterpret existing ones.",
+      "DO NOT invent new levels or reinterpret existing ones.",
       "DO NOT modify $id URLs, version strings, or schema paths independently."
     ],
   
@@ -23,24 +23,43 @@
       "rules": [
         "Any schema change must match the version in SOUSTACK_SPEC_VERSION.",
         "PATCH releases are documentation, examples, or fixture-only.",
-        "MINOR releases may add optional fields or clarify profiles.",
+        "MINOR releases may add optional fields or clarify levels or stacks.",
         "MAJOR releases are required for breaking changes."
       ]
     },
   
     "schema_editing_rules": [
-      "All schema changes must be JSON Schema Draft-07 compliant.",
+      "Schemas target JSON Schema 2020-12.",
       "Preserve additionalProperties behavior exactly as defined.",
       "Use allOf / anyOf consistently with existing patterns.",
       "Do not refactor schema structure for aesthetics."
     ],
-  
-    "profiles": {
-      "definition": "Profiles are constraint layers on top of the same core schema.",
+
+    "levels": {
+      "definition": "Soustack levels are constraint layers on top of the same core schema.",
       "rules": [
-        "Profiles must not contradict the core schema.",
-        "Profiles may only add requirements, never remove allowances.",
-        "A recipe claiming a profile MUST validate against that profile schema."
+        "Levels are lite and base only.",
+        "Levels may only add requirements, never remove allowances."
+      ]
+    },
+
+    "stacks": {
+      "definition": "Stacks declare optional capability lanes on top of the level.",
+      "vocabulary": [
+        "quantified",
+        "structured",
+        "timed",
+        "referenced",
+        "compute",
+        "dietary",
+        "storage",
+        "substitutions",
+        "techniques",
+        "illustrated"
+      ],
+      "notes": [
+        "Temperature is a supported primitive on steps and ingredients, not a stack.",
+        "Compute depends on quantified and timed; timed implies structured."
       ]
     },
   
@@ -57,7 +76,6 @@
       "normative_files": [
         "SPEC.md",
         "soustack.schema.json",
-        "profiles/*.schema.json",
         "SOUSTACK_SPEC_VERSION"
       ],
       "rules": [
@@ -66,7 +84,14 @@
         "If schema and docs disagree, schema wins."
       ]
     },
-  
+
+    "conformance": {
+      "rules": [
+        "scripts/validate-fixtures.mjs and the fixtures directory define canonical enforcement.",
+        "Keep conformance behavior aligned with schema and SPEC.md." 
+      ]
+    },
+
     "testing_expectations": [
       "Run npm run validate:all before proposing changes.",
       "Never assume tests will be updated to fit schema changes.",

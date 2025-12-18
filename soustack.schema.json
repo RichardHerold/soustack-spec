@@ -63,8 +63,7 @@
     "dietary": { "$ref": "./stacks/dietary.schema.json#/properties/dietary" },
     "storage": { "$ref": "./stacks/storage.schema.json#/properties/storage" },
     "substitutions": { "$ref": "./stacks/substitutions.schema.json#/properties/substitutions" },
-    "techniques": { "$ref": "./stacks/techniques.schema.json#/properties/techniques" },
-    "temperatures": { "$ref": "./stacks/temperature.schema.json#/properties/temperatures" }
+    "techniques": { "$ref": "./stacks/techniques.schema.json#/properties/techniques" }
   },
   "patternProperties": {
     "^x-": { "$ref": "./defs/common.schema.json#/properties/extensionLaneValue" }
