@@ -1,15 +1,25 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "lite",
-  "stacks": ["structured@1", "illustrated@1"],
+  "stacks": {
+    "structured": 1,
+    "illustrated": 1
+  },
   "name": "Picture Smoothie",
-  "ingredients": ["fruit", "yogurt"],
+  "ingredients": [
+    "fruit",
+    "yogurt"
+  ],
   "instructions": [
     {
       "id": "s1",
       "text": "blend",
-      "images": ["http://example.com/blend.jpg"]
+      "images": [
+        "http://example.com/blend.jpg"
+      ]
     }
   ],
-  "images": ["http://example.com/cover2.jpg"]
+  "images": [
+    "http://example.com/cover2.jpg"
+  ]
 }

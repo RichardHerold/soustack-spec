@@ -1,18 +1,35 @@
 #!/usr/bin/env node
 import { readdir, readFile } from 'node:fs/promises';
-import { join, extname } from 'node:path';
+import { join, extname, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const repoRoot = join(__dirname, '..');
+
 const ajv = new Ajv2020({ strict: false, allErrors: true, allowUnionTypes: true });
 addFormats(ajv);
+
+let registry = null;
+
+async function loadRegistry() {
+  if (!registry) {
+    const registryPath = join(repoRoot, 'stacks', 'registry.json');
+    registry = JSON.parse(await readFile(registryPath, 'utf8'));
+  }
+  return registry;
+}
 
 async function loadSchemas() {
   const schemaFiles = [];
   for (const dir of ['defs', 'stacks']) {
     const entries = await readdir(dir);
     for (const entry of entries) {
-      if (entry.endsWith('.json')) schemaFiles.push(join(dir, entry));
+      if (entry.endsWith('.json') && entry !== 'registry.json') {
+        schemaFiles.push(join(dir, entry));
+      }
     }
   }
   schemaFiles.push('soustack.schema.json');
@@ -37,11 +54,33 @@ async function walk(dir) {
   return files;
 }
 
-function normalizeStacks(list = []) {
+function normalizeStacksToMap(stacks) {
+  // Convert array format to map format if needed
+  if (Array.isArray(stacks)) {
+    const map = {};
+    for (const entry of stacks) {
+      if (typeof entry === 'string') {
+        const match = entry.match(/^([^@]+)@(\d+)$/);
+        if (match) {
+          const [, name, major] = match;
+          map[name] = parseInt(major, 10);
+        } else {
+          throw new Error(`Invalid stack format: ${entry} (must be name@major)`);
+        }
+      }
+    }
+    return map;
+  }
+  if (typeof stacks === 'object' && stacks !== null) {
+    return stacks;
+  }
+  return {};
+}
+
+function getStacksSet(stacksMap) {
   const set = new Set();
-  for (const entry of list) {
-    if (typeof entry !== 'string') continue;
-    set.add(entry);
+  for (const [name, major] of Object.entries(stacksMap)) {
+    set.add(`${name}@${major}`);
   }
   return set;
 }
@@ -126,9 +165,47 @@ function validateDAG(steps) {
   return null;
 }
 
-function checkConformance(data, file) {
+function checkConformance(data, file, reg) {
   const errors = [];
-  const stacks = normalizeStacks(data.stacks || []);
+  
+  // Normalize stacks to map format
+  let stacksMap;
+  let warnedArray = false;
+  if (Array.isArray(data.stacks)) {
+    warnedArray = true;
+    stacksMap = normalizeStacksToMap(data.stacks);
+  } else {
+    stacksMap = normalizeStacksToMap(data.stacks || {});
+  }
+  
+  // Validate stacks against registry
+  const officialStacks = Object.keys(reg.stacks).filter(id => !id.startsWith('x-'));
+  for (const [stackId, major] of Object.entries(stacksMap)) {
+    if (stackId.startsWith('x-')) {
+      // Vendor stacks are allowed
+      continue;
+    }
+    if (!officialStacks.includes(stackId)) {
+      errors.push(`Unknown official stack: ${stackId}`);
+      continue;
+    }
+    const stack = reg.stacks[stackId];
+    if (major !== stack.latestMajor) {
+      errors.push(`Stack "${stackId}" major ${major} not supported (latest: ${stack.latestMajor})`);
+    }
+    // Check prerequisites
+    for (const req of stack.requires) {
+      if (!(req in stacksMap) || stacksMap[req] !== 1) {
+        errors.push(`Stack "${stackId}" requires "${req}@1" but it is not present`);
+      }
+    }
+  }
+  
+  if (warnedArray) {
+    console.warn(`Warning: ${file} uses array stacks format. Should migrate to map format.`);
+  }
+  
+  const stacks = getStacksSet(stacksMap);
   const ingredients = collectIngredients(data.ingredients);
   const steps = collectSteps(data.instructions);
 
@@ -258,6 +335,7 @@ function checkConformance(data, file) {
 
 async function main() {
   await loadSchemas();
+  const reg = await loadRegistry();
   const validate = ajv.getSchema('https://soustack.spec/soustack.schema.json');
   if (!validate) throw new Error('main schema not loaded');
 
@@ -266,7 +344,7 @@ async function main() {
 
   for (const file of fixtureFiles) {
     const raw = await readFile(file, 'utf8');
-    const data = JSON.parse(raw);
+    let data = JSON.parse(raw);
     const expectValid = file.includes('.valid.');
     const expectInvalid = file.includes('.invalid.');
 
@@ -275,9 +353,14 @@ async function main() {
       continue;
     }
 
+    // Normalize stacks to map for schema validation
+    if (Array.isArray(data.stacks)) {
+      data = { ...data, stacks: normalizeStacksToMap(data.stacks) };
+    }
+
     const schemaOk = validate(data);
     const schemaErrors = schemaOk ? [] : validate.errors || [];
-    const conformanceErrors = checkConformance(data, file);
+    const conformanceErrors = checkConformance(data, file, reg);
     const overallErrors = [...schemaErrors.map((e) => ajv.errorsText([e], { separator: '; ' })), ...conformanceErrors];
     const passed = schemaOk && conformanceErrors.length === 0;
 

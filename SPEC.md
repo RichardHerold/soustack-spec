@@ -250,3 +250,34 @@ This specification uses semantic versioning. Schema identifiers and conformance 
 
 Non-normative guidance, examples, and adoption notes MAY be published separately and are not part of this specification.
 
+
+
+<!-- BEGIN GENERATED: STACK REGISTRY -->
+
+## Profiles
+
+| Profile | Description | Requires |
+| ------- | ----------- | -------- |
+| **Base** | name, ingredients, instructions | — |
+| **Lite** | Minimal publishable recipe | base |
+| **Scalable** | Quantified + scaling | lite |
+| **Timed** | Structured + timed | lite |
+| **Illustrated** | Media present | lite |
+
+## Stacks
+
+| Stack ID | Latest Major | Requires | Profile | Schema | Docs |
+| -------- | ----------- | -------- | ------- | ------ | ---- |
+| **quantified** | 1 | — | scalable | `stacks/quantified.schema.json` | — |
+| **scaling** | 1 | quantified | scalable | `stacks/scaling.schema.json` | `stacks/scaling@1.md` |
+| **structured** | 1 | — | timed | `stacks/structured.schema.json` | — |
+| **timed** | 1 | structured | timed | `stacks/timed.schema.json` | — |
+| **referenced** | 1 | structured | timed | `stacks/referenced.schema.json` | — |
+| **illustrated** | 1 | — | illustrated | `stacks/illustrated.schema.json` | — |
+| **dietary** | 1 | — | lite | `stacks/dietary.schema.json` | — |
+| **substitutions** | 1 | referenced | lite | `stacks/substitutions.schema.json` | — |
+| **techniques** | 1 | — | lite | `stacks/techniques.schema.json` | — |
+| **storage** | 1 | — | lite | `stacks/storage.schema.json` | — |
+| **compute** | 1 | quantified, timed | lite | `stacks/compute.schema.json` | — |
+
+<!-- END GENERATED: STACK REGISTRY -->

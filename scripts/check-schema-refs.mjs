@@ -9,10 +9,16 @@ addFormats(ajv);
 
 async function listSchemas() {
   const schemaFiles = [];
-  for (const dir of ['defs', 'stacks']) {
-    const entries = await readdir(dir);
-    for (const entry of entries) {
-      if (entry.endsWith('.json')) schemaFiles.push(join(dir, entry));
+  for (const dir of ['defs', 'stacks', 'schemas']) {
+    try {
+      const entries = await readdir(dir);
+      for (const entry of entries) {
+        if (entry.endsWith('.json') && entry !== 'registry.json') {
+          schemaFiles.push(join(dir, entry));
+        }
+      }
+    } catch {
+      // Directory doesn't exist, skip
     }
   }
   schemaFiles.push('soustack.schema.json');

@@ -4,8 +4,17 @@
   "title": "Soustack Specification",
   "type": "object",
   "properties": {
-    "$schema": { "type": "string", "const": "https://soustack.spec/soustack.schema.json" },
-    "level": { "type": "string", "enum": ["lite", "base"] },
+    "$schema": {
+      "type": "string",
+      "const": "https://soustack.spec/soustack.schema.json"
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "lite",
+        "base"
+      ]
+    },
     "profile": {
       "type": "string",
       "enum": [
@@ -24,43 +33,72 @@
       ]
     },
     "stacks": {
-      "type": "array",
-      "items": { "$ref": "./defs/common.schema.json#/properties/stackId" },
-      "uniqueItems": true
+      "$ref": "#/$defs/stacksMap"
     },
-    "name": { "type": "string" },
+    "name": {
+      "type": "string"
+    },
     "yield": {
       "type": "object",
       "properties": {
-        "amount": { "type": "number", "exclusiveMinimum": 0 },
-        "unit": { "type": "string", "minLength": 1 },
-        "metadata": { "type": "object", "additionalProperties": true }
+        "amount": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
       },
-      "required": ["amount", "unit"],
+      "required": [
+        "amount",
+        "unit"
+      ],
       "additionalProperties": false,
       "patternProperties": {
-        "^x-": { "$ref": "./defs/common.schema.json#/properties/extensionLaneValue" }
+        "^x-": {
+          "$ref": "./defs/common.schema.json#/properties/extensionLaneValue"
+        }
       }
     },
     "time": {
       "type": "object",
       "properties": {
-        "total": { "$ref": "./defs/duration.schema.json#/properties/DurationMinutes" },
-        "metadata": { "type": "object", "additionalProperties": true }
+        "total": {
+          "$ref": "./defs/duration.schema.json#/properties/DurationMinutes"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
       },
-      "required": ["total"],
+      "required": [
+        "total"
+      ],
       "additionalProperties": false,
       "patternProperties": {
-        "^x-": { "$ref": "./defs/common.schema.json#/properties/extensionLaneValue" }
+        "^x-": {
+          "$ref": "./defs/common.schema.json#/properties/extensionLaneValue"
+        }
       }
     },
     "ingredients": {
       "type": "array",
       "items": {
         "anyOf": [
-          { "type": "string" },
-          { "$ref": "#/$defs/ingredient" },
-          { "$ref": "#/$defs/ingredientSection" }
+          {
+            "type": "string"
+          },
+          {
+            "$ref": "#/$defs/ingredient"
+          },
+          {
+            "$ref": "#/$defs/ingredientSection"
+          }
         ]
       }
     },
@@ -68,284 +106,1027 @@
       "type": "array",
       "items": {
         "anyOf": [
-          { "type": "string" },
-          { "$ref": "#/$defs/step" },
-          { "$ref": "#/$defs/stepSection" }
+          {
+            "type": "string"
+          },
+          {
+            "$ref": "#/$defs/step"
+          },
+          {
+            "$ref": "#/$defs/stepSection"
+          }
         ]
       }
     },
-    "metadata": { "type": "object", "additionalProperties": true },
-    "images": { "type": "array", "items": { "$ref": "./defs/common.schema.json#/properties/uri" } },
-    "videos": { "type": "array", "items": { "$ref": "./defs/common.schema.json#/properties/uri" } },
-    "dietary": { "$ref": "./stacks/dietary.schema.json#/properties/dietary" },
-    "storage": { "$ref": "./stacks/storage.schema.json#/properties/storage" },
-    "substitutions": { "$ref": "./stacks/substitutions.schema.json#/properties/substitutions" },
-    "techniques": { "$ref": "./stacks/techniques.schema.json#/properties/techniques" },
-    "scaling": { "$ref": "./stacks/scaling.schema.json#/properties/scaling" }
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "$ref": "./defs/common.schema.json#/properties/uri"
+      }
+    },
+    "videos": {
+      "type": "array",
+      "items": {
+        "$ref": "./defs/common.schema.json#/properties/uri"
+      }
+    },
+    "dietary": {
+      "$ref": "./stacks/dietary.schema.json#/properties/dietary"
+    },
+    "storage": {
+      "$ref": "./stacks/storage.schema.json#/properties/storage"
+    },
+    "substitutions": {
+      "$ref": "./stacks/substitutions.schema.json#/properties/substitutions"
+    },
+    "techniques": {
+      "$ref": "./stacks/techniques.schema.json#/properties/techniques"
+    },
+    "scaling": {
+      "$ref": "./stacks/scaling.schema.json#/properties/scaling"
+    }
   },
   "patternProperties": {
-    "^x-": { "$ref": "./defs/common.schema.json#/properties/extensionLaneValue" }
+    "^x-": {
+      "$ref": "./defs/common.schema.json#/properties/extensionLaneValue"
+    }
   },
-  "required": ["level", "stacks", "name", "ingredients", "instructions"],
+  "required": [
+    "level",
+    "stacks",
+    "name",
+    "ingredients",
+    "instructions"
+  ],
   "allOf": [
-    {
-      "if": { "properties": { "level": { "const": "base" } } },
-      "then": { "required": ["yield", "time"] }
-    },
     {
       "if": {
         "properties": {
-          "stacks": {
-            "allOf": [
-              { "contains": { "enum": ["quantified@1"] } },
-              { "not": { "contains": { "enum": ["scaling@1"] } } }
-            ]
+          "level": {
+            "const": "base"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "yield",
+          "time"
+        ]
+      }
+    },
+    {
+      "$comment": "BEGIN GENERATED STACK GATING"
+    },
+    {
+      "if": {
+        "required": [
+          "profile"
+        ],
+        "properties": {
+          "profile": {
+            "const": "lite"
           }
         }
       },
       "then": {
         "properties": {
-          "ingredients": { "$ref": "./stacks/quantified.schema.json#/properties/ingredients" }
+          "level": {
+            "const": "lite"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "profile"
+        ],
+        "properties": {
+          "profile": {
+            "const": "base"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "level": {
+            "const": "base"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "profile"
+        ],
+        "properties": {
+          "profile": {
+            "const": "scalable"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
+            "required": [
+              "quantified",
+              "scaling"
+            ],
+            "properties": {
+              "quantified": {
+                "const": 1
+              },
+              "scaling": {
+                "const": 1
+              }
+            }
+          },
+          "level": {
+            "const": "base"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "profile"
+        ],
+        "properties": {
+          "profile": {
+            "const": "timed"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
+            "required": [
+              "structured",
+              "timed"
+            ],
+            "properties": {
+              "structured": {
+                "const": 1
+              },
+              "timed": {
+                "const": 1
+              }
+            }
+          },
+          "level": {
+            "const": "base"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "profile"
+        ],
+        "properties": {
+          "profile": {
+            "const": "illustrated"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
+            "required": [
+              "illustrated"
+            ],
+            "properties": {
+              "illustrated": {
+                "const": 1
+              }
+            }
+          },
+          "level": {
+            "const": "base"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "quantified"
+                ],
+                "properties": {
+                  "quantified": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "stacks"
+              ],
+              "properties": {
+                "stacks": {
+                  "required": [
+                    "scaling"
+                  ],
+                  "properties": {
+                    "scaling": {
+                      "const": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "ingredients": {
+            "$ref": "./stacks/quantified.schema.json#/properties/ingredients"
+          }
         },
-        "required": ["ingredients"]
-      }
-    },
-    {
-      "if": { "properties": { "stacks": { "contains": { "enum": ["structured@1"] } } } },
-      "then": {
-        "properties": {
-          "instructions": { "$ref": "./stacks/structured.schema.json#/properties/instructions" }
-        }
-      }
-    },
-    {
-      "if": { "properties": { "stacks": { "contains": { "enum": ["scaling@1"] } } } },
-      "then": {
-        "properties": {
-          "ingredients": { "$ref": "./stacks/scaling.schema.json#/properties/ingredients" },
-          "scaling": { "$ref": "./stacks/scaling.schema.json#/properties/scaling" },
-          "stacks": { "contains": { "enum": ["quantified@1"] } }
+        "required": [
+          "ingredients"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "quantified"
+              ],
+              "properties": {
+                "quantified": {
+                  "not": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
         },
-        "required": ["ingredients", "scaling"]
-      }
-    },
-    {
-      "if": { "properties": { "stacks": { "contains": { "enum": ["timed@1"] } } } },
-      "then": {
-        "properties": {
-          "instructions": { "$ref": "./stacks/timed.schema.json#/properties/instructions" }
+        "then": {
+          "not": {}
         }
       }
     },
     {
-      "if": { "properties": { "stacks": { "contains": { "enum": ["referenced@1"] } } } },
+      "if": {
+        "allOf": [
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "scaling"
+                ],
+                "properties": {
+                  "scaling": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "quantified"
+                ],
+                "properties": {
+                  "quantified": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
       "then": {
         "properties": {
-          "ingredients": { "$ref": "./stacks/referenced.schema.json#/properties/ingredients" },
-          "instructions": { "$ref": "./stacks/referenced.schema.json#/properties/instructions" }
+          "ingredients": {
+            "$ref": "./stacks/scaling.schema.json#/properties/ingredients"
+          },
+          "scaling": {
+            "$ref": "./stacks/scaling.schema.json#/properties/scaling"
+          }
         },
-        "required": ["ingredients", "instructions"]
+        "required": [
+          "ingredients",
+          "scaling"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "scaling"
+              ],
+              "properties": {
+                "scaling": {
+                  "not": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
       }
     },
     {
-      "if": { "properties": { "stacks": { "contains": { "enum": ["compute@1"] } } } },
-      "then": {
+      "if": {
+        "required": [
+          "stacks"
+        ],
         "properties": {
-          "level": { "const": "base" },
           "stacks": {
-            "allOf": [
-              { "contains": { "enum": ["quantified@1"] } },
-              { "contains": { "enum": ["timed@1"] } }
-            ]
+            "required": [
+              "structured"
+            ],
+            "properties": {
+              "structured": {
+                "const": 1
+              }
+            }
           }
         }
-      }
-    },
-    {
-      "if": { "properties": { "stacks": { "contains": { "enum": ["storage@1"] } } } },
-      "then": { "required": ["storage"] }
-    },
-    {
-      "if": { "properties": { "stacks": { "contains": { "enum": ["dietary@1"] } } } },
-      "then": { "required": ["dietary"] }
-    },
-    {
-      "if": { "properties": { "stacks": { "contains": { "enum": ["substitutions@1"] } } } },
-      "then": { "required": ["substitutions"] }
-    },
-    {
-      "if": { "properties": { "stacks": { "contains": { "enum": ["techniques@1"] } } } },
-      "then": { "required": ["techniques"] }
-    },
-    {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "lite" } } },
-      "then": { "properties": { "level": { "const": "lite" } } }
-    },
-    {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "base" } } },
-      "then": { "properties": { "level": { "const": "base" } } }
-    },
-    {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "structured" } } },
+      },
       "then": {
         "properties": {
-          "level": { "const": "base" },
-          "stacks": { "contains": { "enum": ["structured@1"] } }
-        }
-      }
-    },
-    {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "referenced" } } },
-      "then": {
-        "properties": {
-          "level": { "const": "base" },
-          "stacks": {
-            "allOf": [
-              { "contains": { "enum": ["structured@1"] } },
-              { "contains": { "enum": ["referenced@1"] } }
-            ]
+          "instructions": {
+            "$ref": "./stacks/structured.schema.json#/properties/instructions"
           }
         }
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "structured"
+              ],
+              "properties": {
+                "structured": {
+                  "not": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
       }
     },
     {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "timed" } } },
+      "if": {
+        "allOf": [
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "timed"
+                ],
+                "properties": {
+                  "timed": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "structured"
+                ],
+                "properties": {
+                  "structured": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
       "then": {
         "properties": {
-          "level": { "const": "base" },
-          "stacks": {
-            "allOf": [
-              { "contains": { "enum": ["structured@1"] } },
-              { "contains": { "enum": ["timed@1"] } }
-            ]
+          "instructions": {
+            "$ref": "./stacks/timed.schema.json#/properties/instructions"
           }
         }
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "timed"
+              ],
+              "properties": {
+                "timed": {
+                  "not": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
       }
     },
     {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "schedulable" } } },
+      "if": {
+        "allOf": [
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "referenced"
+                ],
+                "properties": {
+                  "referenced": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "structured"
+                ],
+                "properties": {
+                  "structured": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
       "then": {
         "properties": {
-          "level": { "const": "base" },
+          "ingredients": {
+            "$ref": "./stacks/referenced.schema.json#/properties/ingredients"
+          },
+          "instructions": {
+            "$ref": "./stacks/referenced.schema.json#/properties/instructions"
+          }
+        },
+        "required": [
+          "ingredients",
+          "instructions"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "referenced"
+              ],
+              "properties": {
+                "referenced": {
+                  "not": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
           "stacks": {
-            "allOf": [
-              { "contains": { "enum": ["structured@1"] } },
-              { "contains": { "enum": ["timed@1"] } }
-            ]
+            "required": [
+              "illustrated"
+            ],
+            "properties": {
+              "illustrated": {
+                "const": 1
+              }
+            }
           }
         }
-      }
-    },
-    {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "quantified" } } },
-      "then": {
-        "properties": {
-          "level": { "const": "base" },
-          "stacks": { "contains": { "enum": ["quantified@1"] } }
+      },
+      "then": {},
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "illustrated"
+              ],
+              "properties": {
+                "illustrated": {
+                  "not": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
         }
       }
     },
     {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "scalable" } } },
-      "then": {
+      "if": {
+        "required": [
+          "stacks"
+        ],
         "properties": {
-          "level": { "const": "base" },
           "stacks": {
-            "allOf": [
-              { "contains": { "enum": ["quantified@1"] } },
-              { "contains": { "enum": ["scaling@1"] } }
-            ]
+            "required": [
+              "dietary"
+            ],
+            "properties": {
+              "dietary": {
+                "const": 1
+              }
+            }
           }
         }
-      }
-    },
-    {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "illustrated" } } },
+      },
       "then": {
-        "properties": {
-          "level": { "const": "base" },
-          "stacks": { "contains": { "enum": ["illustrated@1"] } }
+        "required": [
+          "dietary"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "dietary"
+              ],
+              "properties": {
+                "dietary": {
+                  "not": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
         }
       }
     },
     {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "nutrition" } } },
+      "if": {
+        "allOf": [
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "substitutions"
+                ],
+                "properties": {
+                  "substitutions": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "referenced"
+                ],
+                "properties": {
+                  "referenced": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
       "then": {
-        "properties": {
-          "level": { "const": "base" },
-          "stacks": { "contains": { "enum": ["nutrition@1"] } }
+        "required": [
+          "substitutions"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "substitutions"
+              ],
+              "properties": {
+                "substitutions": {
+                  "not": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
         }
       }
     },
     {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "dietary" } } },
-      "then": {
+      "if": {
+        "required": [
+          "stacks"
+        ],
         "properties": {
-          "level": { "const": "base" },
-          "stacks": { "contains": { "enum": ["dietary@1"] } }
+          "stacks": {
+            "required": [
+              "techniques"
+            ],
+            "properties": {
+              "techniques": {
+                "const": 1
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "techniques"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "techniques"
+              ],
+              "properties": {
+                "techniques": {
+                  "not": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
         }
       }
     },
     {
-      "if": { "required": ["profile"], "properties": { "profile": { "const": "storage" } } },
-      "then": {
+      "if": {
+        "required": [
+          "stacks"
+        ],
         "properties": {
-          "level": { "const": "base" },
-          "stacks": { "contains": { "enum": ["storage@1"] } }
+          "stacks": {
+            "required": [
+              "storage"
+            ],
+            "properties": {
+              "storage": {
+                "const": 1
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "storage"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "storage"
+              ],
+              "properties": {
+                "storage": {
+                  "not": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
         }
       }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "compute"
+                ],
+                "properties": {
+                  "compute": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "quantified"
+                ],
+                "properties": {
+                  "quantified": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "timed"
+                ],
+                "properties": {
+                  "timed": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "level": {
+            "const": "base"
+          }
+        }
+      },
+      "then": {},
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "compute"
+              ],
+              "properties": {
+                "compute": {
+                  "not": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
+      }
+    },
+    {
+      "$comment": "END GENERATED STACK GATING"
     }
   ],
   "unevaluatedProperties": false,
   "$defs": {
+    "stackName": {
+      "type": "string",
+      "pattern": "^(?:[a-z][a-z0-9-]*|x-[a-z0-9-]+(?:\\.[a-z0-9-]+)*)$"
+    },
+    "stackMajor": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "stacksMap": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/stackName"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/stackMajor"
+      }
+    },
     "ingredient": {
       "allOf": [
-        { "$ref": "./defs/entities.schema.json#/$defs/IngredientBase" }
+        {
+          "$ref": "./defs/entities.schema.json#/$defs/IngredientBase"
+        }
       ]
     },
     "ingredientSection": {
       "type": "object",
       "properties": {
-        "section": { "type": "string" },
+        "section": {
+          "type": "string"
+        },
         "ingredients": {
           "type": "array",
           "items": {
             "anyOf": [
-              { "type": "string" },
-              { "$ref": "#/$defs/ingredient" },
-              { "$ref": "#/$defs/ingredientSection" }
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/$defs/ingredient"
+              },
+              {
+                "$ref": "#/$defs/ingredientSection"
+              }
             ]
           }
         },
-        "metadata": { "type": "object", "additionalProperties": true }
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
       },
-      "required": ["section", "ingredients"],
+      "required": [
+        "section",
+        "ingredients"
+      ],
       "additionalProperties": false,
       "patternProperties": {
-        "^x-": { "$ref": "./defs/common.schema.json#/properties/extensionLaneValue" }
+        "^x-": {
+          "$ref": "./defs/common.schema.json#/properties/extensionLaneValue"
+        }
       }
     },
-    "step": { "$ref": "./defs/entities.schema.json#/$defs/StepBase" },
+    "step": {
+      "$ref": "./defs/entities.schema.json#/$defs/StepBase"
+    },
     "stepSection": {
       "type": "object",
       "properties": {
-        "section": { "type": "string" },
+        "section": {
+          "type": "string"
+        },
         "steps": {
           "type": "array",
           "items": {
             "anyOf": [
-              { "type": "string" },
-              { "$ref": "#/$defs/step" },
-              { "$ref": "#/$defs/stepSection" }
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/$defs/step"
+              },
+              {
+                "$ref": "#/$defs/stepSection"
+              }
             ]
           }
         },
-        "metadata": { "type": "object", "additionalProperties": true }
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
       },
-      "required": ["section", "steps"],
+      "required": [
+        "section",
+        "steps"
+      ],
       "additionalProperties": false,
       "patternProperties": {
-        "^x-": { "$ref": "./defs/common.schema.json#/properties/extensionLaneValue" }
+        "^x-": {
+          "$ref": "./defs/common.schema.json#/properties/extensionLaneValue"
+        }
       }
     }
   }

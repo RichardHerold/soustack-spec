@@ -17,10 +17,20 @@
   "required": ["ingredients"],
   "$defs": {
     "ingredient": {
-      "allOf": [
-        { "$ref": "../defs/ingredientQuantified.schema.json" }
-      ],
-      "unevaluatedProperties": false
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "quantity": { "$ref": "../defs/quantity.schema.json" },
+        "temperature": { "$ref": "../defs/temperature.schema.json" },
+        "notes": { "type": "string" },
+        "metadata": { "type": "object", "additionalProperties": true }
+      },
+      "required": ["id", "name", "quantity"],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+      }
     },
     "ingredientSection": {
       "type": "object",
