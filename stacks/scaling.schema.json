@@ -47,19 +47,6 @@
         {
           "type": "object",
           "properties": {
-            "bakersPercentage": {
-              "type": "object",
-              "properties": {
-                "of": { "type": "string" },
-                "percent": { "type": "number", "exclusiveMinimum": 0 },
-                "metadata": { "type": "object", "additionalProperties": true }
-              },
-              "required": ["of", "percent"],
-              "additionalProperties": false,
-              "patternProperties": {
-                "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
-              }
-            },
             "scaling": { "$ref": "../defs/scalingRule.schema.json" }
           }
         }

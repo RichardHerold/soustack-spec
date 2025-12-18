@@ -1,7 +1,7 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "lite",
-  "stacks": ["illustrated"],
+  "stacks": ["illustrated@1"],
   "name": "No Media",
   "ingredients": ["thing"],
   "instructions": ["step"]

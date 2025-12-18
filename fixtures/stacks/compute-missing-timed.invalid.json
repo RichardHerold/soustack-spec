@@ -1,7 +1,7 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "base",
-  "stacks": ["quantified", "compute"],
+  "stacks": ["quantified@1", "compute@1"],
   "name": "Compute Without Timed",
   "yield": { "amount": 1, "unit": "dish" },
   "time": { "total": { "minutes": 10 } },

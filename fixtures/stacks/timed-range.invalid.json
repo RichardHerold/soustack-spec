@@ -1,7 +1,7 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "base",
-  "stacks": ["structured", "timed"],
+  "stacks": ["structured@1", "timed@1"],
   "name": "Bad Range",
   "yield": { "amount": 2, "unit": "servings" },
   "time": { "total": { "minutes": 15 } },

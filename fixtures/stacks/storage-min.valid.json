@@ -1,7 +1,7 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "lite",
-  "stacks": ["storage"],
+  "stacks": ["storage@1"],
   "name": "Leftover Soup",
   "ingredients": ["soup"],
   "instructions": ["reheat when ready"],

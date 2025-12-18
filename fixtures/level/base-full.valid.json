@@ -1,7 +1,7 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "base",
-  "stacks": ["quantified", "structured", "timed", "referenced", "compute", "storage", "dietary", "substitutions", "techniques", "illustrated"],
+  "stacks": ["quantified@1", "structured@1", "timed@1", "referenced@1", "compute@1", "storage@1", "dietary@1", "substitutions@1", "techniques@1", "illustrated@1"],
   "name": "Garlic Pasta",
   "yield": { "amount": 4, "unit": "servings" },
   "time": { "total": { "minutes": 45 } },

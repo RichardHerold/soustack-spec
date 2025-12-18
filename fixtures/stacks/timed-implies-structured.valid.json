@@ -1,7 +1,7 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "base",
-  "stacks": ["timed"],
+  "stacks": ["timed@1"],
   "name": "Rested dough",
   "yield": { "amount": 2, "unit": "loaves" },
   "time": { "total": { "minutes": 180 } },

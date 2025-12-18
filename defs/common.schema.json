@@ -6,29 +6,27 @@
   "properties": {
     "stackId": {
       "type": "string",
-      "enum": [
-        "quantified",
-        "quantified@1",
-        "structured",
-        "structured@1",
-        "timed",
-        "timed@1",
-        "referenced",
-        "referenced@1",
-        "compute",
-        "compute@1",
-        "storage",
-        "storage@1",
-        "dietary",
-        "dietary@1",
-        "substitutions",
-        "substitutions@1",
-        "techniques",
-        "techniques@1",
-        "illustrated",
-        "illustrated@1",
-        "scaling",
-        "scaling@1"
+      "anyOf": [
+        {
+          "enum": [
+            "quantified@1",
+            "structured@1",
+            "timed@1",
+            "referenced@1",
+            "compute@1",
+            "storage@1",
+            "dietary@1",
+            "substitutions@1",
+            "techniques@1",
+            "illustrated@1",
+            "scaling@1",
+            "nutrition@1"
+          ]
+        },
+        {
+          "pattern": "^x-[A-Za-z0-9_-]+@[0-9]+$",
+          "description": "Extension stacks must use x- prefix and include a major version"
+        }
       ]
     },
     "extensionLane": {

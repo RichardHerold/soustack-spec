@@ -42,8 +42,6 @@ function normalizeStacks(list = []) {
   for (const entry of list) {
     if (typeof entry !== 'string') continue;
     set.add(entry);
-    const base = entry.split('@')[0];
-    set.add(base);
   }
   return set;
 }
@@ -152,12 +150,12 @@ function checkConformance(data, file) {
     if (dup) errors.push(dup);
   }
 
-  if (stacks.has('structured') || stacks.has('timed') || stacks.has('referenced')) {
+  if (stacks.has('structured@1') || stacks.has('timed@1') || stacks.has('referenced@1')) {
     const dagIssue = validateDAG(steps);
     if (dagIssue) errors.push(dagIssue);
   }
 
-  if (stacks.has('referenced')) {
+  if (stacks.has('referenced@1')) {
     const ids = new Set(ingredients.map((i) => i.id));
     for (const step of steps) {
       if (!Array.isArray(step.inputs) || step.inputs.length === 0) {
@@ -170,7 +168,7 @@ function checkConformance(data, file) {
     }
   }
 
-  if (stacks.has('timed')) {
+  if (stacks.has('timed@1')) {
     for (const step of steps) {
       const duration = step?.timing?.duration;
       if (duration && typeof duration === 'object' && 'minMinutes' in duration && 'maxMinutes' in duration) {
@@ -181,18 +179,23 @@ function checkConformance(data, file) {
     }
   }
 
-  if (stacks.has('compute')) {
-    if (data.level !== 'base' || !stacks.has('quantified') || !stacks.has('timed')) {
+  if (stacks.has('compute@1')) {
+    if (data.level !== 'base' || !stacks.has('quantified@1') || !stacks.has('timed@1')) {
       errors.push('compute stack requires base level with quantified and timed stacks');
     }
   }
 
-  if (stacks.has('scaling')) {
+  if (stacks.has('scaling@1')) {
     const ingredientIds = new Set(ingredients.map((i) => i.id));
     for (const ingredient of ingredients) {
-      const bp = ingredient?.bakersPercentage;
-      if (bp && (!bp.of || !ingredientIds.has(bp.of))) {
-        errors.push(`bakersPercentage of references missing ingredient id: ${bp.of || ''}`.trim());
+      const scaling = ingredient?.scaling;
+      if (scaling && scaling.mode === 'bakersPercent') {
+        if (!scaling.percent || scaling.percent <= 0) {
+          errors.push('bakersPercent scaling requires percent > 0');
+        }
+        if (!scaling.of || !ingredientIds.has(scaling.of)) {
+          errors.push(`bakersPercent of references missing ingredient id: ${scaling.of || ''}`.trim());
+        }
       }
     }
 
@@ -204,7 +207,7 @@ function checkConformance(data, file) {
     }
   }
 
-  if (stacks.has('illustrated')) {
+  if (stacks.has('illustrated@1')) {
     const stepHasMedia = steps.some((s) => Array.isArray(s.images)?.length || Array.isArray(s.videos)?.length);
     const recipeHasMedia = (Array.isArray(data.images) && data.images.length > 0) ||
       (Array.isArray(data.videos) && data.videos.length > 0);
@@ -213,7 +216,7 @@ function checkConformance(data, file) {
     }
   }
 
-  if (stacks.has('dietary')) {
+  if (stacks.has('dietary@1')) {
     if (!data.dietary) {
       errors.push('dietary block missing');
     } else {
@@ -226,7 +229,7 @@ function checkConformance(data, file) {
     }
   }
 
-  if (stacks.has('techniques')) {
+  if (stacks.has('techniques@1')) {
     const glossary = Array.isArray(data.techniques) ? data.techniques : [];
     const glossaryIds = new Set(glossary.map((t) => t.id));
     for (const step of steps) {
@@ -237,7 +240,7 @@ function checkConformance(data, file) {
     if (glossary.length === 0) errors.push('techniques stack requires glossary');
   }
 
-  if (stacks.has('storage')) {
+  if (stacks.has('storage@1')) {
     const storage = data.storage || {};
     const methods = ['roomTemp', 'refrigerated', 'frozen'];
     const present = methods.filter((m) => storage[m]);
