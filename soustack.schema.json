@@ -6,6 +6,23 @@
   "properties": {
     "$schema": { "type": "string", "const": "https://soustack.spec/soustack.schema.json" },
     "level": { "type": "string", "enum": ["lite", "base"] },
+    "profile": {
+      "type": "string",
+      "enum": [
+        "lite",
+        "base",
+        "structured",
+        "referenced",
+        "timed",
+        "schedulable",
+        "quantified",
+        "scalable",
+        "illustrated",
+        "nutrition",
+        "dietary",
+        "storage"
+      ]
+    },
     "stacks": {
       "type": "array",
       "items": { "$ref": "./defs/common.schema.json#/properties/stackId" },
@@ -159,6 +176,124 @@
     {
       "if": { "properties": { "stacks": { "contains": { "enum": ["techniques", "techniques@1"] } } } },
       "then": { "required": ["techniques"] }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "lite" } } },
+      "then": { "properties": { "level": { "const": "lite" } } }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "base" } } },
+      "then": { "properties": { "level": { "const": "base" } } }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "structured" } } },
+      "then": {
+        "properties": {
+          "level": { "const": "base" },
+          "stacks": { "contains": { "enum": ["structured", "structured@1"] } }
+        }
+      }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "referenced" } } },
+      "then": {
+        "properties": {
+          "level": { "const": "base" },
+          "stacks": {
+            "allOf": [
+              { "contains": { "enum": ["structured", "structured@1"] } },
+              { "contains": { "enum": ["referenced", "referenced@1"] } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "timed" } } },
+      "then": {
+        "properties": {
+          "level": { "const": "base" },
+          "stacks": {
+            "allOf": [
+              { "contains": { "enum": ["structured", "structured@1"] } },
+              { "contains": { "enum": ["timed", "timed@1"] } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "schedulable" } } },
+      "then": {
+        "properties": {
+          "level": { "const": "base" },
+          "stacks": {
+            "allOf": [
+              { "contains": { "enum": ["structured", "structured@1"] } },
+              { "contains": { "enum": ["timed", "timed@1"] } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "quantified" } } },
+      "then": {
+        "properties": {
+          "level": { "const": "base" },
+          "stacks": { "contains": { "enum": ["quantified", "quantified@1"] } }
+        }
+      }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "scalable" } } },
+      "then": {
+        "properties": {
+          "level": { "const": "base" },
+          "stacks": {
+            "allOf": [
+              { "contains": { "enum": ["quantified", "quantified@1"] } },
+              { "contains": { "enum": ["scaling", "scaling@1"] } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "illustrated" } } },
+      "then": {
+        "properties": {
+          "level": { "const": "base" },
+          "stacks": { "contains": { "enum": ["illustrated", "illustrated@1"] } }
+        }
+      }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "nutrition" } } },
+      "then": {
+        "properties": {
+          "level": { "const": "base" },
+          "stacks": { "contains": { "enum": ["nutrition", "nutrition@1"] } }
+        }
+      }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "dietary" } } },
+      "then": {
+        "properties": {
+          "level": { "const": "base" },
+          "stacks": { "contains": { "enum": ["dietary", "dietary@1"] } }
+        }
+      }
+    },
+    {
+      "if": { "required": ["profile"], "properties": { "profile": { "const": "storage" } } },
+      "then": {
+        "properties": {
+          "level": { "const": "base" },
+          "stacks": { "contains": { "enum": ["storage", "storage@1"] } }
+        }
+      }
     }
   ],
   "unevaluatedProperties": false,
