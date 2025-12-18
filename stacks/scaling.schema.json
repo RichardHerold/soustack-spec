@@ -42,33 +42,29 @@
   "required": ["ingredients", "scaling"],
   "$defs": {
     "ingredient": {
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "quantity": { "$ref": "../defs/quantity.schema.json" },
-        "temperature": { "$ref": "../defs/temperature.schema.json" },
-        "notes": { "type": "string" },
-        "bakersPercentage": {
+      "allOf": [
+        { "$ref": "../defs/ingredientQuantified.schema.json" },
+        {
           "type": "object",
           "properties": {
-            "of": { "type": "string" },
-            "percent": { "type": "number", "exclusiveMinimum": 0 },
-            "metadata": { "type": "object", "additionalProperties": true }
-          },
-          "required": ["of", "percent"],
-          "additionalProperties": false,
-          "patternProperties": {
-            "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+            "bakersPercentage": {
+              "type": "object",
+              "properties": {
+                "of": { "type": "string" },
+                "percent": { "type": "number", "exclusiveMinimum": 0 },
+                "metadata": { "type": "object", "additionalProperties": true }
+              },
+              "required": ["of", "percent"],
+              "additionalProperties": false,
+              "patternProperties": {
+                "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+              }
+            },
+            "scaling": { "$ref": "../defs/scalingRule.schema.json" }
           }
-        },
-        "metadata": { "type": "object", "additionalProperties": true }
-      },
-      "required": ["name", "id", "quantity"],
-      "additionalProperties": false,
-      "patternProperties": {
-        "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
-      }
+        }
+      ],
+      "unevaluatedProperties": false
     },
     "ingredientSection": {
       "type": "object",
