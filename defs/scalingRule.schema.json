@@ -1,6 +1,6 @@
 {
-"$id": "[https://soustack.spec/defs/scalingRule.schema.json](https://soustack.spec/defs/scalingRule.schema.json)",
-"$schema": "[https://json-schema.org/draft/2020-12/schema](https://json-schema.org/draft/2020-12/schema)",
+"$id": "https://soustack.spec/defs/scalingRule.schema.json",
+"$schema": "https://json-schema.org/draft/2020-12/schema",
 "title": "Soustack ScalingRule",
 "type": "object",
 "additionalProperties": false,

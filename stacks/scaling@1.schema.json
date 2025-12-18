@@ -1,6 +1,6 @@
 {
-"$id": "[https://soustack.spec/stacks/scaling@1.schema.json](https://soustack.spec/stacks/scaling@1.schema.json)",
-"$schema": "[https://json-schema.org/draft/2020-12/schema](https://json-schema.org/draft/2020-12/schema)",
+"$id": "https://soustack.spec/stacks/scaling@1.schema.json",
+"$schema": "https://json-schema.org/draft/2020-12/schema",
 "title": "Soustack scaling@1 stack",
 "type": "object",
 "additionalProperties": true,
