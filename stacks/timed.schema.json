@@ -3,20 +3,21 @@
   "$id": "https://soustack.spec/stacks/timed.schema.json",
   "title": "Timed Stack",
   "type": "object",
-  "properties": {
-    "instructions": {
-      "type": "array",
-      "items": {
-        "anyOf": [
-          { "$ref": "#/$defs/timedStep" },
-          { "$ref": "#/$defs/timedStepSection" }
-        ]
+  "allOf": [
+    { "$ref": "./structured.schema.json" },
+    {
+      "properties": {
+        "instructions": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/timedStep" },
+              { "$ref": "#/$defs/timedStepSection" }
+            ]
+          }
+        }
       }
     }
-  },
-  "required": ["instructions"],
-  "allOf": [
-    { "$ref": "./structured.schema.json" }
   ],
   "$defs": {
     "timedStep": {
@@ -25,10 +26,31 @@
         {
           "properties": {
             "timing": {
-              "allOf": [
-                { "$ref": "../defs/entities.schema.json#/$defs/StepBase/properties/timing" },
-                { "required": ["activity"], "anyOf": [ { "required": ["duration"] }, { "required": ["completionCue"] } ] }
-              ]
+              "type": "object",
+              "properties": {
+                "activity": { "type": "string", "enum": ["active", "passive"] },
+                "duration": {
+                  "type": "object",
+                  "oneOf": [
+                    { "$ref": "../defs/duration.schema.json#/properties/DurationMinutes" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minMinutes": { "type": "number", "exclusiveMinimum": 0 },
+                        "maxMinutes": { "type": "number", "exclusiveMinimum": 0 }
+                      },
+                      "required": ["minMinutes", "maxMinutes"],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "completionCue": { "type": "string" }
+              },
+              "anyOf": [
+                { "required": ["duration"] },
+                { "required": ["completionCue"] }
+              ],
+              "additionalProperties": false
             }
           },
           "required": ["id", "timing"]

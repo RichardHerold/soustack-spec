@@ -3,29 +3,30 @@
   "$id": "https://soustack.spec/stacks/referenced.schema.json",
   "title": "Referenced Stack",
   "type": "object",
-  "properties": {
-    "ingredients": {
-      "type": "array",
-      "items": {
-        "anyOf": [
-          { "$ref": "#/$defs/ingredient" },
-          { "$ref": "#/$defs/ingredientSection" }
-        ]
-      }
-    },
-    "instructions": {
-      "type": "array",
-      "items": {
-        "anyOf": [
-          { "$ref": "#/$defs/referencedStep" },
-          { "$ref": "#/$defs/referencedSection" }
-        ]
+  "allOf": [
+    { "$ref": "./structured.schema.json" },
+    {
+      "properties": {
+        "ingredients": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/ingredient" },
+              { "$ref": "#/$defs/ingredientSection" }
+            ]
+          }
+        },
+        "instructions": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/referencedStep" },
+              { "$ref": "#/$defs/referencedSection" }
+            ]
+          }
+        }
       }
     }
-  },
-  "required": ["ingredients", "instructions"],
-  "allOf": [
-    { "$ref": "./structured.schema.json" }
   ],
   "$defs": {
     "ingredient": {
@@ -56,10 +57,10 @@
         {
           "properties": {
             "inputs": {
-              "allOf": [
-                { "$ref": "../defs/entities.schema.json#/$defs/StepBase/properties/inputs" },
-                { "minItems": 1 }
-              ]
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           "required": ["id", "inputs"]
