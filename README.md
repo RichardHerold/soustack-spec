@@ -81,7 +81,7 @@ Profiles are defined normatively in **SPEC.md**.
 | Schedulable                   | Dependency graph + timing              |
 | Quantified                    | Machine-readable quantities            |
 | Scalable                      | Interoperable scaling rules            |
-| Illustrated/ Nutrition / Dietary / Storage | Optional enrichment                    |
+| Illustrated / Nutrition / Dietary / Storage | Optional enrichment                    |
 
 ---
 
