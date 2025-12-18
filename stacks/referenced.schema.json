@@ -24,9 +24,7 @@
     }
   },
   "required": ["ingredients", "instructions"],
-  "allOf": [
-    { "$ref": "./structured.schema.json" }
-  ],
+  "additionalProperties": false,
   "$defs": {
     "ingredient": {
       "allOf": [
