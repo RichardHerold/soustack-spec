@@ -8,15 +8,27 @@
       "type": "string",
       "enum": [
         "quantified",
+        "quantified@1",
         "structured",
+        "structured@1",
         "timed",
+        "timed@1",
         "referenced",
+        "referenced@1",
         "compute",
+        "compute@1",
         "storage",
+        "storage@1",
         "dietary",
+        "dietary@1",
         "substitutions",
+        "substitutions@1",
         "techniques",
-        "illustrated"
+        "techniques@1",
+        "illustrated",
+        "illustrated@1",
+        "scaling",
+        "scaling@1"
       ]
     },
     "extensionLane": {
