@@ -603,47 +603,21 @@
     },
     {
       "if": {
-        "allOf": [
-          {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
             "required": [
-              "stacks"
+              "quantified"
             ],
             "properties": {
-              "stacks": {
-                "required": [
-                  "quantified"
-                ],
-                "properties": {
-                  "quantified": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          },
-          {
-            "not": {
-              "required": [
-                "stacks"
-              ],
-              "properties": {
-                "stacks": {
-                  "required": [
-                    "scaling"
-                  ],
-                  "properties": {
-                    "scaling": {
-                      "type": "integer",
-                      "enum": [
-                        1
-                      ]
-                    }
-                  }
-                }
+              "quantified": {
+                "const": 1
               }
             }
           }
-        ]
+        }
       },
       "then": {
         "properties": {
@@ -1574,6 +1548,9 @@
         "metadata": {
           "type": "object",
           "additionalProperties": true
+        },
+        "scaling": {
+          "$ref": "https://soustack.spec/defs/scalingRule.schema.json"
         }
       },
       "required": [
