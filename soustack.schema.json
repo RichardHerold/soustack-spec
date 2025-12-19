@@ -1181,6 +1181,9 @@
                   "frozen": {
                     "$ref": "#/$defs/storage@1_storageMethod"
                   },
+                  "leftovers": {
+                    "$ref": "#/$defs/storage@1_leftovers"
+                  },
                   "metadata": {
                     "type": "object",
                     "additionalProperties": true
@@ -2328,6 +2331,41 @@
       "required": [
         "text"
       ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "storage@1_leftovers": {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "string"
+        },
+        "reheat": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "https://soustack.spec/stacks/storage.schema.json#/$defs/reheatInstruction"
+              },
+              "minItems": 1
+            }
+          ]
+        },
+        "portioning": {
+          "$ref": "https://soustack.spec/stacks/storage.schema.json#/$defs/portioning"
+        }
+      },
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
