@@ -12,6 +12,21 @@
         "quantity": { "$ref": "./quantity.schema.json" },
         "temperature": { "$ref": "./temperature.schema.json" },
         "notes": { "type": "string" },
+        "prep": {
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "anyOf": [
+                  { "type": "string", "minLength": 1 },
+                  { "$ref": "../stacks/prep.schema.json#/$defs/prepItem" }
+                ]
+              }
+            }
+          ]
+        },
         "metadata": { "type": "object", "additionalProperties": true }
       },
       "required": ["name"],
