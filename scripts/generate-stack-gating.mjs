@@ -180,6 +180,9 @@ function buildStackPresenceCondition(stackId, supportedMajors) {
 
 /**
  * Generate gating rules for a single stack
+ * Returns an object with allOf containing:
+ * - Unsupported major rejection rule
+ * - Per-major if/then rules (with prerequisites in then)
  */
 async function generateStackGatingRule(stackId, stack, registry, allDefs) {
   const supportedMajors = Object.keys(stack.schema.major)
@@ -188,8 +191,32 @@ async function generateStackGatingRule(stackId, stack, registry, allDefs) {
   
   const requires = stack.requires || [];
   
-  // Build prerequisite conditions: require all prerequisite stacks to be present
-  // with any supported major (not a specific version)
+  // A2: Generate unsupported major rejection rule
+  // This rule rejects unsupported majors when the stack is present
+  const unsupportedMajorRule = {
+    if: {
+      required: ['stacks'],
+      properties: {
+        stacks: {
+          required: [stackId]
+        }
+      }
+    },
+    then: {
+      properties: {
+        stacks: {
+          properties: {
+            [stackId]: {
+              enum: supportedMajors
+            }
+          }
+        }
+      }
+    }
+  };
+  
+  // A1: Build prerequisite conditions for each prerequisite stack
+  // Each prerequisite must exist AND be a supported major
   const prerequisiteConditions = [];
   for (const reqStackId of requires) {
     const reqStack = registry.stacks[reqStackId];
@@ -199,10 +226,21 @@ async function generateStackGatingRule(stackId, stack, registry, allDefs) {
     const reqSupportedMajors = Object.keys(reqStack.schema.major)
       .map(m => parseInt(m, 10))
       .sort((a, b) => a - b);
-    prerequisiteConditions.push(buildStackPresenceCondition(reqStackId, reqSupportedMajors));
+    prerequisiteConditions.push({
+      properties: {
+        stacks: {
+          required: [reqStackId],
+          properties: {
+            [reqStackId]: {
+              enum: reqSupportedMajors
+            }
+          }
+        }
+      }
+    });
   }
   
-  // Generate oneOf for each supported major version
+  // Generate per-major if/then rules
   const majorRules = [];
   for (const major of supportedMajors) {
     const schemaPath = stack.schema.major[String(major)];
@@ -247,57 +285,45 @@ async function generateStackGatingRule(stackId, stack, registry, allDefs) {
       }
     }
     
-    // Build if condition: stack present with this major + all prerequisites
-    const ifConditions = [
-      buildStackMajorCondition(stackId, major),
-      ...prerequisiteConditions
-    ];
+    // A1: Build if condition: stack present with this specific major (no prerequisites in if)
+    const ifCondition = buildStackMajorCondition(stackId, major);
     
-    const ifCondition = ifConditions.length === 1 
-      ? ifConditions[0] 
-      : { allOf: ifConditions };
+    // A1: Build then clause: allOf with prerequisites + schema properties
+    const thenClauseAllOf = [];
     
-    // Build then clause: apply schema properties and required fields
-    const thenClause = {};
+    // Add prerequisite conditions to then
+    thenClauseAllOf.push(...prerequisiteConditions);
+    
+    // Add schema properties and required fields
+    const schemaClause = {};
     if (Object.keys(schemaInfo.properties).length > 0) {
-      thenClause.properties = schemaInfo.properties;
+      schemaClause.properties = schemaInfo.properties;
     }
     if (schemaInfo.required.length > 0) {
-      thenClause.required = schemaInfo.required;
+      schemaClause.required = schemaInfo.required;
+    }
+    if (Object.keys(schemaClause).length > 0) {
+      thenClauseAllOf.push(schemaClause);
     }
     
-    // Build else clause: reject unsupported major (only if stack is present)
-    const elseClause = {
-      if: {
-        required: ['stacks'],
-        properties: {
-          stacks: {
-            required: [stackId],
-            properties: {
-              [stackId]: { 
-                type: 'integer',
-                not: { enum: supportedMajors }
-              }
-            }
-          }
-        }
-      },
-      then: { not: {} } // Reject unsupported major
-    };
+    // Build then clause
+    const thenClause = thenClauseAllOf.length === 1
+      ? thenClauseAllOf[0]
+      : { allOf: thenClauseAllOf };
     
     majorRules.push({
       if: ifCondition,
-      then: Object.keys(thenClause).length > 0 ? thenClause : {},
-      else: elseClause
+      then: thenClause
     });
   }
   
-  // If multiple majors, wrap in oneOf
-  if (majorRules.length === 1) {
-    return majorRules[0];
-  } else {
-    return { oneOf: majorRules };
-  }
+  // A3: Return allOf with unsupported major rule + per-major rules (no oneOf)
+  return {
+    allOf: [
+      unsupportedMajorRule,
+      ...majorRules
+    ]
+  };
 }
 
 /**
