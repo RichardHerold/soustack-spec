@@ -11,7 +11,8 @@
     "lite": { "title": "Lite", "description": "Minimal publishable recipe", "requiresProfiles": ["base"], "requiresStacks": [] },
     "scalable": { "title": "Scalable", "description": "Quantified + scaling", "requiresProfiles": ["lite"], "requiresStacks": ["quantified", "scaling"] },
     "timed": { "title": "Timed", "description": "Structured + timed", "requiresProfiles": ["lite"], "requiresStacks": ["structured", "timed"] },
-    "illustrated": { "title": "Illustrated", "description": "Media present", "requiresProfiles": ["lite"], "requiresStacks": ["illustrated"] }
+    "illustrated": { "title": "Illustrated", "description": "Media present", "requiresProfiles": ["lite"], "requiresStacks": ["illustrated"] },
+    "equipped": { "title": "Equipped", "description": "Recipe declares required tools/equipment.", "requiresProfiles": ["lite"], "requiresStacks": ["equipment"] }
   },
   "stacks": {
     "quantified": {
@@ -91,6 +92,14 @@
       "profile": "lite",
       "requires": ["quantified", "timed"],
       "schema": { "major": { "1": "stacks/compute.schema.json" } }
+    },
+    "equipment": {
+      "title": "Equipment",
+      "latestMajor": 1,
+      "profile": "lite",
+      "requires": [],
+      "schema": { "major": { "1": "stacks/equipment.schema.json" } },
+      "docs": { "major": { "1": "stacks/equipment@1.md" } }
     }
   }
 }

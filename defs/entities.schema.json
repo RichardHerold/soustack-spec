@@ -39,6 +39,14 @@
           "items": { "type": "string" },
           "uniqueItems": true
         },
+        "usesEquipment": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]+$"
+          },
+          "uniqueItems": true
+        },
         "temperature": { "$ref": "./temperature.schema.json" },
         "timing": {
           "type": "object",

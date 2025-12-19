@@ -21,6 +21,7 @@
         {
           "enum": [
             "base",
+            "equipped",
             "illustrated",
             "lite",
             "scalable",
@@ -180,6 +181,38 @@
     },
     {
       "$comment": "BEGIN GENERATED STACK GATING"
+    },
+    {
+      "if": {
+        "required": [
+          "profile"
+        ],
+        "properties": {
+          "profile": {
+            "const": "equipped"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
+            "required": [
+              "equipment"
+            ],
+            "properties": {
+              "equipment": {
+                "type": "integer",
+                "enum": [
+                  1
+                ]
+              }
+            }
+          }
+        }
+      }
     },
     {
       "if": {
@@ -520,6 +553,78 @@
             },
             "required": [
               "dietary"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "equipment"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "stacks": {
+                "properties": {
+                  "equipment": {
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "equipment"
+                ],
+                "properties": {
+                  "equipment": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "equipment": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "$ref": "#/$defs/equipment@1_equipmentItem"
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "equipment"
             ]
           }
         }
@@ -1943,6 +2048,103 @@
       "required": [
         "section",
         "steps"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "equipment@1_equipmentItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+$",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "countScaling": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "fixed",
+                "linear"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "const": "threshold"
+                },
+                "steps": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "maxFactor": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "count": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "required": [
+                      "maxFactor",
+                      "count"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "mode",
+                "steps"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "upgrades": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "minFactor": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "use": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9._-]+$",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "minFactor",
+              "use"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name"
       ],
       "additionalProperties": false,
       "patternProperties": {

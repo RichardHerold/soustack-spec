@@ -1,0 +1,22 @@
+{
+  "$schema": "https://soustack.spec/soustack.schema.json",
+  "level": "lite",
+  "profile": "equipped",
+  "stacks": {
+    "equipment": 1
+  },
+  "name": "Simple Recipe with Equipment",
+  "equipment": [
+    "mixing bowl",
+    "whisk"
+  ],
+  "ingredients": [
+    "flour",
+    "eggs"
+  ],
+  "instructions": [
+    "Mix ingredients in a bowl",
+    "Whisk until smooth"
+  ]
+}
+
