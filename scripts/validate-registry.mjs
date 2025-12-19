@@ -96,11 +96,22 @@ async function main() {
     }
   }
 
-  // Check profile requires
+  // Check profile requiresProfiles
   for (const [profileId, profile] of Object.entries(registry.profiles)) {
-    for (const req of profile.requires) {
+    const requiresProfiles = profile.requiresProfiles || [];
+    for (const req of requiresProfiles) {
       if (!profileIds.has(req)) {
-        errors.push(`Profile "${profileId}" requires missing profile: "${req}"`);
+        errors.push(`Profile "${profileId}" requiresProfiles references missing profile: "${req}"`);
+      }
+    }
+  }
+
+  // Check profile requiresStacks
+  for (const [profileId, profile] of Object.entries(registry.profiles)) {
+    const requiresStacks = profile.requiresStacks || [];
+    for (const req of requiresStacks) {
+      if (!stackIds.has(req)) {
+        errors.push(`Profile "${profileId}" requiresStacks references missing stack: "${req}"`);
       }
     }
   }
@@ -115,10 +126,10 @@ async function main() {
     errors.push(`Stack dependency cycles detected: ${stackCycles.join('; ')}`);
   }
 
-  // Check for cycles in profile graph
+  // Check for cycles in profile graph (via requiresProfiles)
   const profileGraph = new Map();
   for (const [profileId, profile] of Object.entries(registry.profiles)) {
-    profileGraph.set(profileId, new Set(profile.requires));
+    profileGraph.set(profileId, new Set(profile.requiresProfiles || []));
   }
   const profileCycles = checkCycles(profileGraph, 'profile');
   if (profileCycles.length > 0) {

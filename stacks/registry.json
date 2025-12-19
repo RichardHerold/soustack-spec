@@ -7,11 +7,11 @@
     "canonicalStacksFormat": "map"
   },
   "profiles": {
-    "base": { "title": "Base", "description": "name, ingredients, instructions", "requires": [] },
-    "lite": { "title": "Lite", "description": "Minimal publishable recipe", "requires": ["base"] },
-    "scalable": { "title": "Scalable", "description": "Quantified + scaling", "requires": ["lite"] },
-    "timed": { "title": "Timed", "description": "Structured + timed", "requires": ["lite"] },
-    "illustrated": { "title": "Illustrated", "description": "Media present", "requires": ["lite"] }
+    "base": { "title": "Base", "description": "name, ingredients, instructions", "requiresProfiles": [], "requiresStacks": [] },
+    "lite": { "title": "Lite", "description": "Minimal publishable recipe", "requiresProfiles": ["base"], "requiresStacks": [] },
+    "scalable": { "title": "Scalable", "description": "Quantified + scaling", "requiresProfiles": ["lite"], "requiresStacks": ["quantified", "scaling"] },
+    "timed": { "title": "Timed", "description": "Structured + timed", "requiresProfiles": ["lite"], "requiresStacks": ["structured", "timed"] },
+    "illustrated": { "title": "Illustrated", "description": "Media present", "requiresProfiles": ["lite"], "requiresStacks": ["illustrated"] }
   },
   "stacks": {
     "quantified": {
