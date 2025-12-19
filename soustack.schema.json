@@ -24,6 +24,7 @@
             "equipped",
             "illustrated",
             "lite",
+            "prepped",
             "scalable",
             "timed"
           ]
@@ -236,6 +237,38 @@
             ],
             "properties": {
               "illustrated": {
+                "type": "integer",
+                "enum": [
+                  1
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "profile"
+        ],
+        "properties": {
+          "profile": {
+            "const": "prepped"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
+            "required": [
+              "prep"
+            ],
+            "properties": {
+              "prep": {
                 "type": "integer",
                 "enum": [
                   1
@@ -705,6 +738,70 @@
                 }
               }
             }
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "prep"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "stacks": {
+                "properties": {
+                  "prep": {
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "prep"
+                ],
+                "properties": {
+                  "prep": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "miseEnPlace": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/prep@1_miseEnPlaceTask"
+                }
+              }
+            },
+            "required": [
+              "miseEnPlace"
+            ]
           }
         }
       ]
@@ -1676,6 +1773,29 @@
         "notes": {
           "type": "string"
         },
+        "prep": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "https://soustack.spec/stacks/prep.schema.json#/$defs/prepItem"
+                  }
+                ]
+              }
+            }
+          ]
+        },
         "metadata": {
           "type": "object",
           "additionalProperties": true
@@ -1855,6 +1975,29 @@
         },
         "notes": {
           "type": "string"
+        },
+        "prep": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "https://soustack.spec/stacks/prep.schema.json#/$defs/prepItem"
+                  }
+                ]
+              }
+            }
+          ]
         },
         "metadata": {
           "type": "object",
@@ -2145,6 +2288,45 @@
       "required": [
         "id",
         "name"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "prep@1_miseEnPlaceTask": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "usesEquipment": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]+$"
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "text"
       ],
       "additionalProperties": false,
       "patternProperties": {

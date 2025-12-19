@@ -264,6 +264,7 @@ Non-normative guidance, examples, and adoption notes MAY be published separately
 | **Equipped** | lite | equipment | Recipe declares required tools/equipment. |
 | **Illustrated** | lite | illustrated | Media present |
 | **Lite** | base | — | Minimal publishable recipe |
+| **Prepped** | lite | prep | Recipe includes prep guidance and/or mise en place tasks. |
 | **Scalable** | lite | quantified, scaling | Quantified + scaling |
 | **Timed** | lite | structured, timed | Structured + timed |
 
@@ -275,6 +276,7 @@ Non-normative guidance, examples, and adoption notes MAY be published separately
 | **dietary** | 1 | — | lite | `stacks/dietary.schema.json` | — |
 | **equipment** | 1 | — | lite | `stacks/equipment.schema.json` | `stacks/equipment@1.md` |
 | **illustrated** | 1 | — | illustrated | `stacks/illustrated.schema.json` | — |
+| **prep** | 1 | — | lite | `stacks/prep.schema.json` | `stacks/prep@1.md` |
 | **quantified** | 1 | — | scalable | `stacks/quantified.schema.json` | — |
 | **referenced** | 1 | structured | timed | `stacks/referenced.schema.json` | — |
 | **scaling** | 1 | quantified | scalable | `stacks/scaling.schema.json` | `stacks/scaling@1.md` |
