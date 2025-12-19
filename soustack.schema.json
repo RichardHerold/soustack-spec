@@ -188,33 +188,27 @@
         ],
         "properties": {
           "profile": {
-            "const": "lite"
+            "const": "illustrated"
           }
         }
       },
       "then": {
-        "properties": {
-          "level": {
-            "const": "lite"
-          }
-        }
-      }
-    },
-    {
-      "if": {
         "required": [
-          "profile"
+          "stacks"
         ],
         "properties": {
-          "profile": {
-            "const": "base"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "level": {
-            "const": "base"
+          "stacks": {
+            "required": [
+              "illustrated"
+            ],
+            "properties": {
+              "illustrated": {
+                "type": "integer",
+                "enum": [
+                  1
+                ]
+              }
+            }
           }
         }
       }
@@ -242,15 +236,18 @@
             ],
             "properties": {
               "quantified": {
-                "const": 1
+                "type": "integer",
+                "enum": [
+                  1
+                ]
               },
               "scaling": {
-                "const": 1
+                "type": "integer",
+                "enum": [
+                  1
+                ]
               }
             }
-          },
-          "level": {
-            "const": "base"
           }
         }
       }
@@ -278,47 +275,18 @@
             ],
             "properties": {
               "structured": {
-                "const": 1
+                "type": "integer",
+                "enum": [
+                  1
+                ]
               },
               "timed": {
-                "const": 1
+                "type": "integer",
+                "enum": [
+                  1
+                ]
               }
             }
-          },
-          "level": {
-            "const": "base"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "required": [
-          "profile"
-        ],
-        "properties": {
-          "profile": {
-            "const": "illustrated"
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "stacks"
-        ],
-        "properties": {
-          "stacks": {
-            "required": [
-              "illustrated"
-            ],
-            "properties": {
-              "illustrated": {
-                "const": 1
-              }
-            }
-          },
-          "level": {
-            "const": "base"
           }
         }
       }
@@ -333,10 +301,10 @@
             "properties": {
               "stacks": {
                 "required": [
-                  "quantified"
+                  "compute"
                 ],
                 "properties": {
-                  "quantified": {
+                  "compute": {
                     "const": 1
                   }
                 }
@@ -344,19 +312,40 @@
             }
           },
           {
-            "not": {
-              "required": [
-                "stacks"
-              ],
-              "properties": {
-                "stacks": {
-                  "required": [
-                    "scaling"
-                  ],
-                  "properties": {
-                    "scaling": {
-                      "const": 1
-                    }
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "quantified"
+                ],
+                "properties": {
+                  "quantified": {
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "timed"
+                ],
+                "properties": {
+                  "timed": {
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -364,10 +353,172 @@
           }
         ]
       },
+      "then": {},
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "compute"
+              ],
+              "properties": {
+                "compute": {
+                  "type": "integer",
+                  "not": {
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
+            "required": [
+              "dietary"
+            ],
+            "properties": {
+              "dietary": {
+                "const": 1
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "dietary": {
+            "$ref": "https://soustack.spec/stacks/dietary.schema.json#/properties/dietary"
+          }
+        },
+        "required": [
+          "dietary"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "dietary"
+              ],
+              "properties": {
+                "dietary": {
+                  "type": "integer",
+                  "not": {
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
+            "required": [
+              "illustrated"
+            ],
+            "properties": {
+              "illustrated": {
+                "const": 1
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "images": {
+            "$ref": "https://soustack.spec/stacks/illustrated.schema.json#/properties/images"
+          },
+          "videos": {
+            "$ref": "https://soustack.spec/stacks/illustrated.schema.json#/properties/videos"
+          },
+          "instructions": {
+            "$ref": "https://soustack.spec/stacks/illustrated.schema.json#/properties/instructions"
+          }
+        }
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "illustrated"
+              ],
+              "properties": {
+                "illustrated": {
+                  "type": "integer",
+                  "not": {
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
+            "required": [
+              "quantified"
+            ],
+            "properties": {
+              "quantified": {
+                "const": 1
+              }
+            }
+          }
+        }
+      },
       "then": {
         "properties": {
           "ingredients": {
-            "$ref": "./stacks/quantified.schema.json#/properties/ingredients"
+            "$ref": "https://soustack.spec/stacks/quantified.schema.json#/properties/ingredients"
           }
         },
         "required": [
@@ -386,8 +537,95 @@
               ],
               "properties": {
                 "quantified": {
+                  "type": "integer",
                   "not": {
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
+      }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "referenced"
+                ],
+                "properties": {
+                  "referenced": {
                     "const": 1
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "structured"
+                ],
+                "properties": {
+                  "structured": {
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "ingredients": {
+            "$ref": "https://soustack.spec/stacks/referenced.schema.json#/properties/ingredients"
+          },
+          "instructions": {
+            "$ref": "https://soustack.spec/stacks/referenced.schema.json#/properties/instructions"
+          }
+        },
+        "required": [
+          "ingredients",
+          "instructions"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "referenced"
+              ],
+              "properties": {
+                "referenced": {
+                  "type": "integer",
+                  "not": {
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -430,7 +668,10 @@
                 ],
                 "properties": {
                   "quantified": {
-                    "const": 1
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -441,10 +682,10 @@
       "then": {
         "properties": {
           "ingredients": {
-            "$ref": "./stacks/scaling.schema.json#/properties/ingredients"
+            "$ref": "https://soustack.spec/stacks/scaling.schema.json#/properties/ingredients"
           },
           "scaling": {
-            "$ref": "./stacks/scaling.schema.json#/properties/scaling"
+            "$ref": "https://soustack.spec/stacks/scaling.schema.json#/properties/scaling"
           }
         },
         "required": [
@@ -464,8 +705,67 @@
               ],
               "properties": {
                 "scaling": {
+                  "type": "integer",
                   "not": {
-                    "const": 1
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
+            "required": [
+              "storage"
+            ],
+            "properties": {
+              "storage": {
+                "const": 1
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "storage": {
+            "$ref": "https://soustack.spec/stacks/storage.schema.json#/properties/storage"
+          }
+        },
+        "required": [
+          "storage"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "storage"
+              ],
+              "properties": {
+                "storage": {
+                  "type": "integer",
+                  "not": {
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -498,9 +798,12 @@
       "then": {
         "properties": {
           "instructions": {
-            "$ref": "./stacks/structured.schema.json#/properties/instructions"
+            "$ref": "https://soustack.spec/stacks/structured.schema.json#/properties/instructions"
           }
-        }
+        },
+        "required": [
+          "instructions"
+        ]
       },
       "else": {
         "if": {
@@ -514,249 +817,11 @@
               ],
               "properties": {
                 "structured": {
+                  "type": "integer",
                   "not": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "then": {
-          "not": {}
-        }
-      }
-    },
-    {
-      "if": {
-        "allOf": [
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
-                  "timed"
-                ],
-                "properties": {
-                  "timed": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          },
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
-                  "structured"
-                ],
-                "properties": {
-                  "structured": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        ]
-      },
-      "then": {
-        "properties": {
-          "instructions": {
-            "$ref": "./stacks/timed.schema.json#/properties/instructions"
-          }
-        }
-      },
-      "else": {
-        "if": {
-          "required": [
-            "stacks"
-          ],
-          "properties": {
-            "stacks": {
-              "required": [
-                "timed"
-              ],
-              "properties": {
-                "timed": {
-                  "not": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "then": {
-          "not": {}
-        }
-      }
-    },
-    {
-      "if": {
-        "allOf": [
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
-                  "referenced"
-                ],
-                "properties": {
-                  "referenced": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          },
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
-                  "structured"
-                ],
-                "properties": {
-                  "structured": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        ]
-      },
-      "then": {
-        "properties": {
-          "ingredients": {
-            "$ref": "./stacks/referenced.schema.json#/properties/ingredients"
-          },
-          "instructions": {
-            "$ref": "./stacks/referenced.schema.json#/properties/instructions"
-          }
-        },
-        "required": [
-          "ingredients",
-          "instructions"
-        ]
-      },
-      "else": {
-        "if": {
-          "required": [
-            "stacks"
-          ],
-          "properties": {
-            "stacks": {
-              "required": [
-                "referenced"
-              ],
-              "properties": {
-                "referenced": {
-                  "not": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "then": {
-          "not": {}
-        }
-      }
-    },
-    {
-      "if": {
-        "required": [
-          "stacks"
-        ],
-        "properties": {
-          "stacks": {
-            "required": [
-              "illustrated"
-            ],
-            "properties": {
-              "illustrated": {
-                "const": 1
-              }
-            }
-          }
-        }
-      },
-      "then": {},
-      "else": {
-        "if": {
-          "required": [
-            "stacks"
-          ],
-          "properties": {
-            "stacks": {
-              "required": [
-                "illustrated"
-              ],
-              "properties": {
-                "illustrated": {
-                  "not": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "then": {
-          "not": {}
-        }
-      }
-    },
-    {
-      "if": {
-        "required": [
-          "stacks"
-        ],
-        "properties": {
-          "stacks": {
-            "required": [
-              "dietary"
-            ],
-            "properties": {
-              "dietary": {
-                "const": 1
-              }
-            }
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "dietary"
-        ]
-      },
-      "else": {
-        "if": {
-          "required": [
-            "stacks"
-          ],
-          "properties": {
-            "stacks": {
-              "required": [
-                "dietary"
-              ],
-              "properties": {
-                "dietary": {
-                  "not": {
-                    "const": 1
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -799,7 +864,10 @@
                 ],
                 "properties": {
                   "referenced": {
-                    "const": 1
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -808,6 +876,11 @@
         ]
       },
       "then": {
+        "properties": {
+          "substitutions": {
+            "$ref": "https://soustack.spec/stacks/substitutions.schema.json#/properties/substitutions"
+          }
+        },
         "required": [
           "substitutions"
         ]
@@ -824,8 +897,11 @@
               ],
               "properties": {
                 "substitutions": {
+                  "type": "integer",
                   "not": {
-                    "const": 1
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -856,6 +932,11 @@
         }
       },
       "then": {
+        "properties": {
+          "techniques": {
+            "$ref": "https://soustack.spec/stacks/techniques.schema.json#/properties/techniques"
+          }
+        },
         "required": [
           "techniques"
         ]
@@ -872,56 +953,11 @@
               ],
               "properties": {
                 "techniques": {
+                  "type": "integer",
                   "not": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "then": {
-          "not": {}
-        }
-      }
-    },
-    {
-      "if": {
-        "required": [
-          "stacks"
-        ],
-        "properties": {
-          "stacks": {
-            "required": [
-              "storage"
-            ],
-            "properties": {
-              "storage": {
-                "const": 1
-              }
-            }
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "storage"
-        ]
-      },
-      "else": {
-        "if": {
-          "required": [
-            "stacks"
-          ],
-          "properties": {
-            "stacks": {
-              "required": [
-                "storage"
-              ],
-              "properties": {
-                "storage": {
-                  "not": {
-                    "const": 1
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -943,40 +979,6 @@
             "properties": {
               "stacks": {
                 "required": [
-                  "compute"
-                ],
-                "properties": {
-                  "compute": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          },
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
-                  "quantified"
-                ],
-                "properties": {
-                  "quantified": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          },
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
                   "timed"
                 ],
                 "properties": {
@@ -986,15 +988,39 @@
                 }
               }
             }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "structured"
+                ],
+                "properties": {
+                  "structured": {
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
           }
-        ],
-        "properties": {
-          "level": {
-            "const": "base"
-          }
-        }
+        ]
       },
-      "then": {},
+      "then": {
+        "properties": {
+          "instructions": {
+            "$ref": "https://soustack.spec/stacks/timed.schema.json#/properties/instructions"
+          }
+        },
+        "required": [
+          "instructions"
+        ]
+      },
       "else": {
         "if": {
           "required": [
@@ -1003,12 +1029,15 @@
           "properties": {
             "stacks": {
               "required": [
-                "compute"
+                "timed"
               ],
               "properties": {
-                "compute": {
+                "timed": {
+                  "type": "integer",
                   "not": {
-                    "const": 1
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
