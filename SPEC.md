@@ -272,18 +272,18 @@ Non-normative guidance, examples, and adoption notes MAY be published separately
 
 | Stack ID | Latest Major | Requires | Profile | Schema | Docs |
 | -------- | ----------- | -------- | ------- | ------ | ---- |
-| **compute** | 1 | quantified, timed | lite | `stacks/compute.schema.json` | — |
-| **dietary** | 1 | — | lite | `stacks/dietary.schema.json` | — |
+| **compute** | 1 | quantified, timed | lite | `stacks/compute.schema.json` | `stacks/compute@1.md` |
+| **dietary** | 1 | — | lite | `stacks/dietary.schema.json` | `stacks/dietary@1.md` |
 | **equipment** | 1 | — | lite | `stacks/equipment.schema.json` | `stacks/equipment@1.md` |
-| **illustrated** | 1 | — | illustrated | `stacks/illustrated.schema.json` | — |
+| **illustrated** | 1 | — | illustrated | `stacks/illustrated.schema.json` | `stacks/illustrated@1.md` |
 | **prep** | 1 | — | lite | `stacks/prep.schema.json` | `stacks/prep@1.md` |
-| **quantified** | 1 | — | scalable | `stacks/quantified.schema.json` | — |
-| **referenced** | 1 | structured | timed | `stacks/referenced.schema.json` | — |
+| **quantified** | 1 | — | scalable | `stacks/quantified.schema.json` | `stacks/quantified@1.md` |
+| **referenced** | 1 | structured | timed | `stacks/referenced.schema.json` | `stacks/referenced@1.md` |
 | **scaling** | 1 | quantified | scalable | `stacks/scaling.schema.json` | `stacks/scaling@1.md` |
-| **storage** | 1 | — | lite | `stacks/storage.schema.json` | — |
-| **structured** | 1 | — | timed | `stacks/structured.schema.json` | — |
-| **substitutions** | 1 | referenced | lite | `stacks/substitutions.schema.json` | — |
-| **techniques** | 1 | — | lite | `stacks/techniques.schema.json` | — |
-| **timed** | 1 | structured | timed | `stacks/timed.schema.json` | — |
+| **storage** | 1 | — | lite | `stacks/storage.schema.json` | `stacks/storage@1.md` |
+| **structured** | 1 | — | timed | `stacks/structured.schema.json` | `stacks/structured@1.md` |
+| **substitutions** | 1 | referenced | lite | `stacks/substitutions.schema.json` | `stacks/substitutions@1.md` |
+| **techniques** | 1 | — | lite | `stacks/techniques.schema.json` | `stacks/techniques@1.md` |
+| **timed** | 1 | structured | timed | `stacks/timed.schema.json` | `stacks/timed@1.md` |
 
 <!-- END GENERATED: STACK REGISTRY -->

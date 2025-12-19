@@ -12,10 +12,11 @@
     "check-refs": "node scripts/check-schema-refs.mjs",
     "validate": "node scripts/validate-fixtures.mjs",
     "verify:registry": "node scripts/validate-registry.mjs",
+    "verify:stack-docs": "node scripts/verify-stack-docs.mjs",
     "build:schemas": "node scripts/generate-stack-gating.mjs",
     "docs:sync": "node scripts/generate-docs-from-registry.mjs",
     "verify:generated": "node scripts/verify-generated-clean.mjs",
-    "verify": "npm run verify:registry && npm run check-refs && npm run guard && npm run validate && npm run verify:generated",
+    "verify": "npm run verify:registry && npm run verify:stack-docs && npm run check-refs && npm run guard && npm run validate && npm run verify:generated",
     "test": "npm run verify"
   },
   "dependencies": {
