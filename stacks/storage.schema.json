@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soustack.spec/stacks/storage.schema.json",
+  "title": "Storage Stack",
+  "type": "object",
+  "properties": {
+    "storage": {
+      "type": "object",
+      "properties": {
+        "roomTemp": { "$ref": "#/$defs/storageMethod" },
+        "refrigerated": { "$ref": "#/$defs/storageMethod" },
+        "frozen": { "$ref": "#/$defs/storageMethod" },
+        "metadata": { "type": "object", "additionalProperties": true }
+      },
+      "anyOf": [
+        { "required": ["roomTemp"] },
+        { "required": ["refrigerated"] },
+        { "required": ["frozen"] }
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+      }
+    }
+  },
+  "required": ["storage"],
+  "$defs": {
+    "storageMethod": {
+      "type": "object",
+      "properties": {
+        "duration": { "$ref": "../defs/duration.schema.json#/properties/StorageDuration" },
+        "notes": { "type": "string" },
+        "metadata": { "type": "object", "additionalProperties": true }
+      },
+      "required": ["duration"],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": { "$ref": "../defs/common.schema.json#/properties/extensionLaneValue" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

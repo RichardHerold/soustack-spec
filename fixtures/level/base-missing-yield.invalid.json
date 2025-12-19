@@ -1,0 +1,12 @@
+{
+  "$schema": "https://soustack.spec/soustack.schema.json",
+  "level": "base",
+  "stacks": {},
+  "name": "Broken Recipe",
+  "ingredients": [
+    "thing"
+  ],
+  "instructions": [
+    "do"
+  ]
+}

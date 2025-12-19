@@ -1,0 +1,108 @@
+{
+    "project": "soustack-spec",
+    "role": "This repository defines the normative Soustack JSON Schema and specification. Treat it as a standards body, not an application codebase.",
+  
+    "principles": [
+      "The schema is the product. Stability and predictability override cleverness.",
+      "Backward compatibility is mandatory unless a MAJOR version bump is explicitly requested.",
+      "Examples and fixtures are conformance tests, not illustrative suggestions.",
+      "If behavior is not described in SPEC.md, it does not exist."
+    ],
+  
+    "hard_rules": [
+      "DO NOT add new schema fields, enums, or definitions without explicit instruction.",
+      "DO NOT rename existing fields, definitions, levels, or files unless explicitly requested.",
+      "DO NOT loosen validation rules silently (e.g. removing required fields, changing types).",
+      "DO NOT add vendor-specific logic, heuristics, or runtime behavior.",
+      "DO NOT invent new levels or reinterpret existing ones.",
+      "DO NOT modify $id URLs, version strings, or schema paths independently."
+    ],
+  
+    "versioning": {
+      "authoritative_source": "SOUSTACK_SPEC_VERSION",
+      "rules": [
+        "Any schema change must match the version in SOUSTACK_SPEC_VERSION.",
+        "PATCH releases are documentation, examples, or fixture-only.",
+        "MINOR releases may add optional fields or clarify levels or stacks.",
+        "MAJOR releases are required for breaking changes."
+      ]
+    },
+  
+    "schema_editing_rules": [
+      "Schemas target JSON Schema 2020-12.",
+      "Preserve additionalProperties behavior exactly as defined.",
+      "Use allOf / anyOf consistently with existing patterns.",
+      "Do not refactor schema structure for aesthetics."
+    ],
+
+    "levels": {
+      "definition": "Soustack levels are constraint layers on top of the same core schema.",
+      "rules": [
+        "Levels are lite and base only.",
+        "Levels may only add requirements, never remove allowances."
+      ]
+    },
+
+    "stacks": {
+      "definition": "Stacks declare optional capability lanes on top of the level.",
+      "vocabulary": [
+        "quantified",
+        "structured",
+        "timed",
+        "referenced",
+        "compute",
+        "dietary",
+        "storage",
+        "substitutions",
+        "techniques",
+        "illustrated"
+      ],
+      "notes": [
+        "Temperature is a supported primitive on steps and ingredients, not a stack.",
+        "Compute depends on quantified and timed; timed implies structured."
+      ]
+    },
+  
+    "examples_and_fixtures": {
+      "rules": [
+        "examples/ must always be valid.",
+        "fixtures/valid must validate.",
+        "fixtures/invalid must fail validation.",
+        "Changing a fixture requires explaining the rule it proves."
+      ]
+    },
+  
+    "documentation": {
+      "normative_files": [
+        "SPEC.md",
+        "soustack.schema.json",
+        "SOUSTACK_SPEC_VERSION"
+      ],
+      "rules": [
+        "SPEC.md is the source of truth for meaning.",
+        "README.md and docs/ may explain but not redefine behavior.",
+        "If schema and docs disagree, schema wins."
+      ]
+    },
+
+    "conformance": {
+      "rules": [
+        "scripts/validate-fixtures.mjs and the fixtures directory define canonical enforcement.",
+        "Keep conformance behavior aligned with schema and SPEC.md." 
+      ]
+    },
+
+    "testing_expectations": [
+      "Run npm run validate:all before proposing changes.",
+      "Never assume tests will be updated to fit schema changes.",
+      "Fix schema or docs, not tests, unless explicitly instructed."
+    ],
+  
+    "ai_behavior_constraints": [
+      "Prefer minimal diffs.",
+      "Ask for clarification instead of guessing intent.",
+      "Surface risks and compatibility impact before making changes.",
+      "If unsure, do nothing and explain why."
+    ]
+  }
+  

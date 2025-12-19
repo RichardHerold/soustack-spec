@@ -1,0 +1,17 @@
+{
+  "$schema": "https://soustack.spec/soustack.schema.json",
+  "level": "lite",
+  "stacks": {
+    "dietary": 1
+  },
+  "name": "Empty Nutrition",
+  "ingredients": [
+    "water"
+  ],
+  "instructions": [
+    "drink"
+  ],
+  "dietary": {
+    "basis": "perServing"
+  }
+}
