@@ -253,6 +253,7 @@ MIT
 | Profile | Requires Profiles | Requires Stacks | Description |
 | ------- | ---------------- | -------------- | ----------- |
 | **Base** | — | — | name, ingredients, instructions |
+| **Equipped** | lite | equipment | Recipe declares required tools/equipment. |
 | **Illustrated** | lite | illustrated | Media present |
 | **Lite** | base | — | Minimal publishable recipe |
 | **Scalable** | lite | quantified, scaling | Quantified + scaling |

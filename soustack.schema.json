@@ -21,6 +21,7 @@
         {
           "enum": [
             "base",
+            "equipped",
             "illustrated",
             "lite",
             "scalable",
@@ -180,6 +181,38 @@
     },
     {
       "$comment": "BEGIN GENERATED STACK GATING"
+    },
+    {
+      "if": {
+        "required": [
+          "profile"
+        ],
+        "properties": {
+          "profile": {
+            "const": "equipped"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
+            "required": [
+              "equipment"
+            ],
+            "properties": {
+              "equipment": {
+                "type": "integer",
+                "enum": [
+                  1
+                ]
+              }
+            }
+          }
+        }
+      }
     },
     {
       "if": {
