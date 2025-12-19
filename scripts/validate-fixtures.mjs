@@ -418,6 +418,58 @@ function checkConformance(data, file, reg) {
     }
   }
 
+  if (hasStackVersion(stacksMap, 'prep', reg)) {
+    const miseEnPlace = data.miseEnPlace || [];
+    
+    // Validate task id uniqueness (only if present)
+    const taskIds = [];
+    for (const task of miseEnPlace) {
+      if (task.id) {
+        if (taskIds.includes(task.id)) {
+          errors.push(`miseEnPlace task id duplicated: ${task.id}`);
+        }
+        taskIds.push(task.id);
+      }
+    }
+    
+    // Validate inputs when referenced stack is present
+    if (hasStackVersion(stacksMap, 'referenced', reg)) {
+      const ingredientIds = new Set(ingredients.map((i) => i.id).filter(Boolean));
+      for (const task of miseEnPlace) {
+        if (Array.isArray(task.inputs)) {
+          for (const inputId of task.inputs) {
+            if (!ingredientIds.has(inputId)) {
+              errors.push(`miseEnPlace task inputs references missing ingredient id: ${inputId}`);
+            }
+          }
+        }
+      }
+    }
+    
+    // Validate usesEquipment when equipment stack is present
+    if (hasStackVersion(stacksMap, 'equipment', reg)) {
+      const equipment = data.equipment || [];
+      const equipmentIds = new Set();
+      
+      // Collect equipment ids from structured objects only
+      for (const item of equipment) {
+        if (item && typeof item === 'object' && item.id) {
+          equipmentIds.add(item.id);
+        }
+      }
+      
+      for (const task of miseEnPlace) {
+        if (Array.isArray(task.usesEquipment)) {
+          for (const eqId of task.usesEquipment) {
+            if (!equipmentIds.has(eqId)) {
+              errors.push(`miseEnPlace task usesEquipment references missing equipment id: ${eqId}`);
+            }
+          }
+        }
+      }
+    }
+  }
+
   return errors;
 }
 

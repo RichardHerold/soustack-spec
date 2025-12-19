@@ -12,7 +12,8 @@
     "scalable": { "title": "Scalable", "description": "Quantified + scaling", "requiresProfiles": ["lite"], "requiresStacks": ["quantified", "scaling"] },
     "timed": { "title": "Timed", "description": "Structured + timed", "requiresProfiles": ["lite"], "requiresStacks": ["structured", "timed"] },
     "illustrated": { "title": "Illustrated", "description": "Media present", "requiresProfiles": ["lite"], "requiresStacks": ["illustrated"] },
-    "equipped": { "title": "Equipped", "description": "Recipe declares required tools/equipment.", "requiresProfiles": ["lite"], "requiresStacks": ["equipment"] }
+    "equipped": { "title": "Equipped", "description": "Recipe declares required tools/equipment.", "requiresProfiles": ["lite"], "requiresStacks": ["equipment"] },
+    "prepped": { "title": "Prepped", "description": "Recipe includes prep guidance and/or mise en place tasks.", "requiresProfiles": ["lite"], "requiresStacks": ["prep"] }
   },
   "stacks": {
     "quantified": {
@@ -100,6 +101,14 @@
       "requires": [],
       "schema": { "major": { "1": "stacks/equipment.schema.json" } },
       "docs": { "major": { "1": "stacks/equipment@1.md" } }
+    },
+    "prep": {
+      "title": "Prep",
+      "latestMajor": 1,
+      "profile": "lite",
+      "requires": [],
+      "schema": { "major": { "1": "stacks/prep.schema.json" } },
+      "docs": { "major": { "1": "stacks/prep@1.md" } }
     }
   }
 }
