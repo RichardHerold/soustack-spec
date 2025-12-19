@@ -7,112 +7,289 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const repoRoot = join(__dirname, '..');
 
-// Stack-specific gating rules - maps stack ID to the schema properties/requirements
-const STACK_SCHEMA_PATHS = {
-  quantified: { properties: { ingredients: './stacks/quantified.schema.json#/properties/ingredients' }, required: ['ingredients'] },
-  scaling: { properties: { ingredients: './stacks/scaling.schema.json#/properties/ingredients', scaling: './stacks/scaling.schema.json#/properties/scaling' }, required: ['ingredients', 'scaling'] },
-  structured: { properties: { instructions: './stacks/structured.schema.json#/properties/instructions' } },
-  timed: { properties: { instructions: './stacks/timed.schema.json#/properties/instructions' } },
-  referenced: { properties: { ingredients: './stacks/referenced.schema.json#/properties/ingredients', instructions: './stacks/referenced.schema.json#/properties/instructions' }, required: ['ingredients', 'instructions'] },
-  storage: { required: ['storage'] },
-  dietary: { required: ['dietary'] },
-  substitutions: { required: ['substitutions'] },
-  techniques: { required: ['techniques'] },
-  illustrated: {},
-  compute: {}
-};
+/**
+ * Recursively rewrite $ref values to make them absolute
+ * When we inline a property from another schema, all $ref values need to be absolute:
+ * - #/$defs/... references become schemaId#/$defs/...
+ * - Relative path references like ../defs/... need to be resolved relative to schemaId
+ */
+function rewriteRefs(obj, schemaId, schemaBasePath) {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => rewriteRefs(item, schemaId, schemaBasePath));
+  }
+  
+  const result = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (key === '$ref' && typeof value === 'string') {
+      // If it's a relative $defs reference, make it absolute
+      if (value.startsWith('#/$defs/') || value.startsWith('#/')) {
+        result[key] = `${schemaId}${value}`;
+      } else if (value.startsWith('../') || value.startsWith('./')) {
+        // Relative path reference - resolve it relative to the schema's base path
+        // schemaBasePath is like "stacks/scaling.schema.json"
+        // value might be "../defs/quantity.schema.json"
+        // We need to resolve this to an absolute URI
+        let finalPath;
+        if (value.startsWith('../')) {
+          // Go up one level from schema dir
+          // schemaBasePath = "stacks/scaling.schema.json"
+          // schemaDir = "stacks"
+          // parentDir = "" (empty, we're at root)
+          // value = "../defs/quantity.schema.json"
+          // finalPath should be "defs/quantity.schema.json"
+          const schemaDir = schemaBasePath.substring(0, schemaBasePath.lastIndexOf('/'));
+          if (schemaDir) {
+            const parentDir = schemaDir.substring(0, schemaDir.lastIndexOf('/'));
+            finalPath = parentDir ? `${parentDir}/${value.substring(3)}` : value.substring(3);
+          } else {
+            finalPath = value.substring(3);
+          }
+        } else if (value.startsWith('./')) {
+          // Same directory as schema
+          const schemaDir = schemaBasePath.substring(0, schemaBasePath.lastIndexOf('/'));
+          finalPath = schemaDir ? `${schemaDir}/${value.substring(2)}` : value.substring(2);
+        } else {
+          finalPath = value;
+        }
+        // Convert to absolute URI, ensuring no double slashes
+        const normalized = finalPath.replace(/\\/g, '/').replace(/^\/+/, '').replace(/\/+/g, '/');
+        result[key] = `https://soustack.spec/${normalized}`;
+      } else if (!value.includes('://') && !value.startsWith('#')) {
+        // Relative path without ./ or ../ - assume it's relative to defs or stacks
+        // This shouldn't happen in our schemas, but handle it
+        result[key] = `https://soustack.spec/${value}`;
+      } else {
+        // Already absolute or external reference
+        result[key] = value;
+      }
+    } else {
+      result[key] = rewriteRefs(value, schemaId, schemaBasePath);
+    }
+  }
+  
+  return result;
+}
 
-function buildStackCondition(stackId, major, requires) {
-  const conditions = [
-    {
-      required: ['stacks'],
-      properties: {
-        stacks: {
-          required: [stackId],
-          properties: {
-            [stackId]: { const: major }
+/**
+ * Load a stack schema and extract its properties and required fields
+ * 
+ * When inlining a property from another schema, we need to:
+ * 1. Inline the property definition
+ * 2. Rewrite all $refs to be absolute (including #/$defs/ and relative paths)
+ * 3. Also inline any $defs that the property depends on, since they contain
+ *    relative path references that won't resolve when the property is used
+ *    in a different schema context
+ */
+async function loadStackSchema(schemaPath) {
+  const fullPath = join(repoRoot, schemaPath);
+  const schema = JSON.parse(await readFile(fullPath, 'utf8'));
+  
+  const properties = schema.properties || {};
+  const required = schema.required || [];
+  
+  // Use the schema's $id if available, otherwise construct from path
+  const schemaId = schema.$id || `https://soustack.spec/${schemaPath.replace(/\\/g, '/')}`;
+  
+  // Collect all $defs names used in the properties
+  const defsUsed = new Set();
+  function collectDefRefs(obj) {
+    if (typeof obj !== 'object' || obj === null) return;
+    if (Array.isArray(obj)) {
+      obj.forEach(collectDefRefs);
+      return;
+    }
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === '$ref' && typeof value === 'string' && value.startsWith('#/$defs/')) {
+        defsUsed.add(value.substring(8)); // Remove '#/$defs/' prefix
+      } else {
+        collectDefRefs(value);
+      }
+    }
+  }
+  
+  for (const prop of Object.values(properties)) {
+    collectDefRefs(prop);
+  }
+  
+  // Build property refs: inline the property definition and rewrite all $refs
+  const propertyRefs = {};
+  for (const propName of Object.keys(properties)) {
+    // Inline the property definition and rewrite all $refs to be absolute
+    const propertyDef = JSON.parse(JSON.stringify(properties[propName]));
+    propertyRefs[propName] = rewriteRefs(propertyDef, schemaId, schemaPath);
+  }
+  
+  // Also collect and inline the $defs we need, with their $refs rewritten
+  const inlinedDefs = {};
+  if (schema.$defs) {
+    for (const defName of defsUsed) {
+      if (schema.$defs[defName]) {
+        const defCopy = JSON.parse(JSON.stringify(schema.$defs[defName]));
+        inlinedDefs[defName] = rewriteRefs(defCopy, schemaId, schemaPath);
+      }
+    }
+  }
+  
+  return {
+    properties: propertyRefs,
+    required: required,
+    defs: inlinedDefs
+  };
+}
+
+/**
+ * Build condition for stack presence with a specific major version
+ */
+function buildStackMajorCondition(stackId, major) {
+  return {
+    required: ['stacks'],
+    properties: {
+      stacks: {
+        required: [stackId],
+        properties: {
+          [stackId]: { const: major }
+        }
+      }
+    }
+  };
+}
+
+/**
+ * Build condition for stack presence (any supported major)
+ */
+function buildStackPresenceCondition(stackId, supportedMajors) {
+  return {
+    required: ['stacks'],
+    properties: {
+      stacks: {
+        required: [stackId],
+        properties: {
+          [stackId]: {
+            type: 'integer',
+            enum: supportedMajors
           }
         }
       }
     }
-  ];
-
-  // Add required stack conditions
-  for (const req of requires) {
-    conditions.push({
-      required: ['stacks'],
-      properties: {
-        stacks: {
-          required: [req],
-          properties: {
-            [req]: { const: 1 } // Assuming all required stacks are at major 1 for now
-          }
-        }
-      }
-    });
-  }
-
-  return conditions.length === 1 ? conditions[0] : { allOf: conditions };
+  };
 }
 
-function generateStackGating(registry) {
-  const gatingRules = [];
-  const officialStacks = Object.keys(registry.stacks).filter(id => !id.startsWith('x-'));
-
-  // Generate validation for each official stack
-  for (const stackId of officialStacks) {
-    const stack = registry.stacks[stackId];
-    const latestMajor = stack.latestMajor;
-    const requires = stack.requires || [];
-
-    // Build if condition: stack present with correct major + all required stacks
-    let ifCondition = buildStackCondition(stackId, latestMajor, requires);
-
+/**
+ * Generate gating rules for a single stack
+ */
+async function generateStackGatingRule(stackId, stack, registry, allDefs) {
+  const supportedMajors = Object.keys(stack.schema.major)
+    .map(m => parseInt(m, 10))
+    .sort((a, b) => a - b);
+  
+  const requires = stack.requires || [];
+  
+  // Build prerequisite conditions: require all prerequisite stacks to be present
+  // with any supported major (not a specific version)
+  const prerequisiteConditions = [];
+  for (const reqStackId of requires) {
+    const reqStack = registry.stacks[reqStackId];
+    if (!reqStack) {
+      throw new Error(`Stack "${stackId}" requires missing stack: "${reqStackId}"`);
+    }
+    const reqSupportedMajors = Object.keys(reqStack.schema.major)
+      .map(m => parseInt(m, 10))
+      .sort((a, b) => a - b);
+    prerequisiteConditions.push(buildStackPresenceCondition(reqStackId, reqSupportedMajors));
+  }
+  
+  // Generate oneOf for each supported major version
+  const majorRules = [];
+  for (const major of supportedMajors) {
+    const schemaPath = stack.schema.major[String(major)];
+    const schemaInfo = await loadStackSchema(schemaPath);
+    
+    // Merge $defs into the global collection (with namespacing to avoid conflicts)
+    if (schemaInfo.defs) {
+      // First pass: collect all def names and create namespace mapping
+      const defNameMap = new Map();
+      for (const defName of Object.keys(schemaInfo.defs)) {
+        const namespacedName = `${stackId}@${major}_${defName}`;
+        defNameMap.set(defName, namespacedName);
+        allDefs[namespacedName] = schemaInfo.defs[defName];
+      }
+      
+      // Second pass: update $refs in properties to point to namespaced $defs
+      function updateDefRefs(obj) {
+        if (typeof obj !== 'object' || obj === null) return obj;
+        if (Array.isArray(obj)) {
+          return obj.map(updateDefRefs);
+        }
+        const result = {};
+        for (const [key, value] of Object.entries(obj)) {
+          if (key === '$ref' && typeof value === 'string') {
+            // If it references one of our $defs, update to namespaced version
+            const defMatch = value.match(/^https:\/\/soustack\.spec\/stacks\/[^#]+#\/\$defs\/(.+)$/);
+            if (defMatch && defNameMap.has(defMatch[1])) {
+              result[key] = `#/$defs/${defNameMap.get(defMatch[1])}`;
+            } else {
+              result[key] = value;
+            }
+          } else {
+            result[key] = updateDefRefs(value);
+          }
+        }
+        return result;
+      }
+      
+      // Update all properties
+      for (const propName of Object.keys(schemaInfo.properties)) {
+        schemaInfo.properties[propName] = updateDefRefs(schemaInfo.properties[propName]);
+      }
+    }
+    
+    // Build if condition: stack present with this major + all prerequisites
+    const ifConditions = [
+      buildStackMajorCondition(stackId, major),
+      ...prerequisiteConditions
+    ];
+    
     // Special case: quantified should NOT apply when scaling is present
     // (scaling includes quantified, so we don't want both rules to apply)
     if (stackId === 'quantified') {
-      ifCondition = {
-        allOf: [
-          ifCondition,
-          {
-            not: {
-              required: ['stacks'],
+      ifConditions.push({
+        not: {
+          required: ['stacks'],
+          properties: {
+            stacks: {
+              required: ['scaling'],
               properties: {
-                stacks: {
-                  required: ['scaling'],
-                  properties: {
-                    scaling: { const: 1 }
-                  }
+                scaling: {
+                  type: 'integer',
+                  enum: Object.keys(registry.stacks.scaling?.schema.major || {})
+                    .map(m => parseInt(m, 10))
+                    .sort((a, b) => a - b)
                 }
               }
             }
           }
-        ]
-      };
+        }
+      });
     }
-
-    // Build then clause from schema paths
-    const schemaInfo = STACK_SCHEMA_PATHS[stackId] || {};
-    const thenClause = {};
     
-    if (schemaInfo.properties) {
-      thenClause.properties = {};
-      for (const [prop, ref] of Object.entries(schemaInfo.properties)) {
-        thenClause.properties[prop] = { $ref: ref };
-      }
+    const ifCondition = ifConditions.length === 1 
+      ? ifConditions[0] 
+      : { allOf: ifConditions };
+    
+    // Build then clause: apply schema properties and required fields
+    const thenClause = {};
+    if (Object.keys(schemaInfo.properties).length > 0) {
+      thenClause.properties = schemaInfo.properties;
     }
-    if (schemaInfo.required) {
+    if (schemaInfo.required.length > 0) {
       thenClause.required = schemaInfo.required;
     }
-
-    // Special cases
-    if (stackId === 'compute') {
-      ifCondition.properties = ifCondition.properties || {};
-      ifCondition.properties.level = { const: 'base' };
-    }
-
+    
     // Build else clause: reject unsupported major (only if stack is present)
-    // We only reject if the stack property exists but has wrong value
     const elseClause = {
       if: {
         required: ['stacks'],
@@ -120,92 +297,140 @@ function generateStackGating(registry) {
           stacks: {
             required: [stackId],
             properties: {
-              [stackId]: { not: { const: latestMajor } }
+              [stackId]: { 
+                type: 'integer',
+                not: { enum: supportedMajors }
+              }
             }
           }
         }
       },
       then: { not: {} } // Reject unsupported major
     };
-
-    const gatingRule = {
+    
+    majorRules.push({
       if: ifCondition,
       then: Object.keys(thenClause).length > 0 ? thenClause : {},
       else: elseClause
-    };
-
-    gatingRules.push(gatingRule);
+    });
   }
-
-  return gatingRules;
+  
+  // If multiple majors, wrap in oneOf
+  if (majorRules.length === 1) {
+    return majorRules[0];
+  } else {
+    return { oneOf: majorRules };
+  }
 }
 
+/**
+ * Generate all stack gating rules and collect $defs to merge
+ */
+async function generateStackGating(registry) {
+  const gatingRules = [];
+  const allDefs = {}; // Collect all $defs from stack schemas
+  
+  // Get official stacks (exclude vendor stacks starting with x-)
+  const officialStacks = Object.keys(registry.stacks)
+    .filter(id => !id.startsWith('x-'))
+    .sort(); // Deterministic ordering
+  
+  // Generate rules for each official stack
+  for (const stackId of officialStacks) {
+    const stack = registry.stacks[stackId];
+    const rule = await generateStackGatingRule(stackId, stack, registry, allDefs);
+    gatingRules.push(rule);
+  }
+  
+  return { rules: gatingRules, defs: allDefs };
+}
+
+/**
+ * Recursively collect all required stacks for a given profile
+ */
+function collectRequiredStacks(profileId, registry, visited = new Set()) {
+  if (visited.has(profileId)) {
+    return new Set(); // Cycle detected, return empty to avoid infinite recursion
+  }
+  visited.add(profileId);
+  
+  const profile = registry.profiles[profileId];
+  if (!profile) {
+    return new Set();
+  }
+  
+  const allRequiredStacks = new Set();
+  
+  // Add direct required stacks
+  const requiresStacks = profile.requiresStacks || [];
+  for (const stackId of requiresStacks) {
+    allRequiredStacks.add(stackId);
+  }
+  
+  // Recursively collect stacks from required profiles
+  const requiresProfiles = profile.requiresProfiles || [];
+  for (const reqProfileId of requiresProfiles) {
+    const reqStacks = collectRequiredStacks(reqProfileId, registry, new Set(visited));
+    for (const stackId of reqStacks) {
+      allRequiredStacks.add(stackId);
+    }
+  }
+  
+  return allRequiredStacks;
+}
+
+/**
+ * Generate profile validation rules
+ */
 function generateProfileValidation(registry) {
   const profileRules = [];
   
-  // Basic profile validation: lite and base profiles
-  profileRules.push({
-    if: { required: ['profile'], properties: { profile: { const: 'lite' } } },
-    then: { properties: { level: { const: 'lite' } } }
-  });
+  // Get all profiles sorted for deterministic output
+  const profileIds = Object.keys(registry.profiles).sort();
   
-  profileRules.push({
-    if: { required: ['profile'], properties: { profile: { const: 'base' } } },
-    then: { properties: { level: { const: 'base' } } }
-  });
-  
-  // Scalable profile requires quantified + scaling stacks
-  profileRules.push({
-    if: { required: ['profile'], properties: { profile: { const: 'scalable' } } },
-    then: {
-      required: ['stacks'],
-      properties: {
-        stacks: {
-          required: ['quantified', 'scaling'],
+  for (const profileId of profileIds) {
+    // Collect all required stacks recursively (from this profile and all prerequisite profiles)
+    const allRequiredStacks = collectRequiredStacks(profileId, registry);
+    const requiresStacks = Array.from(allRequiredStacks).sort();
+    
+    // Only generate rule if there are required stacks
+    if (requiresStacks.length > 0) {
+      const thenClause = {
+        required: ['stacks'],
+        properties: {
+          stacks: {
+            required: requiresStacks,
+            properties: {}
+          }
+        }
+      };
+      
+      // For each required stack, require it to be present with a supported major
+      for (const stackId of requiresStacks) {
+        const stack = registry.stacks[stackId];
+        if (!stack) {
+          throw new Error(`Profile "${profileId}" requires stack "${stackId}" which is not in registry`);
+        }
+        const supportedMajors = Object.keys(stack.schema.major)
+          .map(m => parseInt(m, 10))
+          .sort((a, b) => a - b);
+        thenClause.properties.stacks.properties[stackId] = {
+          type: 'integer',
+          enum: supportedMajors
+        };
+      }
+      
+      profileRules.push({
+        if: {
+          required: ['profile'],
           properties: {
-            quantified: { const: 1 },
-            scaling: { const: 1 }
+            profile: { const: profileId }
           }
         },
-        level: { const: 'base' }
-      }
+        then: thenClause
+      });
     }
-  });
-  
-  // Timed profile requires structured + timed stacks
-  profileRules.push({
-    if: { required: ['profile'], properties: { profile: { const: 'timed' } } },
-    then: {
-      required: ['stacks'],
-      properties: {
-        stacks: {
-          required: ['structured', 'timed'],
-          properties: {
-            structured: { const: 1 },
-            timed: { const: 1 }
-          }
-        },
-        level: { const: 'base' }
-      }
-    }
-  });
-  
-  // Illustrated profile requires illustrated stack
-  profileRules.push({
-    if: { required: ['profile'], properties: { profile: { const: 'illustrated' } } },
-    then: {
-      required: ['stacks'],
-      properties: {
-        stacks: {
-          required: ['illustrated'],
-          properties: {
-            illustrated: { const: 1 }
-          }
-        },
-        level: { const: 'base' }
-      }
-    }
-  });
+  }
   
   return profileRules;
 }
@@ -217,9 +442,15 @@ async function main() {
   const registry = JSON.parse(await readFile(registryPath, 'utf8'));
   const schema = JSON.parse(await readFile(schemaPath, 'utf8'));
 
-  // Generate gating rules
-  const gatingRules = generateStackGating(registry);
+  // Generate gating rules and collect $defs
+  const { rules: gatingRules, defs: stackDefs } = await generateStackGating(registry);
   const profileRules = generateProfileValidation(registry);
+
+  // Merge $defs from stack schemas into main schema
+  if (!schema.$defs) {
+    schema.$defs = {};
+  }
+  Object.assign(schema.$defs, stackDefs);
 
   // Find the placeholder in allOf
   const allOf = schema.allOf;
@@ -239,7 +470,7 @@ async function main() {
     throw new Error('Could not find stack gating markers in schema');
   }
 
-  // Replace content between markers (include profile validation before stack gating)
+  // Replace content between markers (profile validation before stack gating)
   const newAllOf = [
     ...allOf.slice(0, beginIdx + 1),
     ...profileRules,
@@ -251,11 +482,10 @@ async function main() {
 
   // Write back
   await writeFile(schemaPath, JSON.stringify(schema, null, 2) + '\n', 'utf8');
-  console.log(`Generated ${gatingRules.length} stack gating rules in soustack.schema.json`);
+  console.log(`Generated ${gatingRules.length} stack gating rules and ${profileRules.length} profile validation rules in soustack.schema.json`);
 }
 
 main().catch(err => {
   console.error(err);
   process.exit(1);
 });
-

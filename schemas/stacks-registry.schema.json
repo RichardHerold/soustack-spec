@@ -27,12 +27,20 @@
         "properties": {
           "title": { "type": "string" },
           "description": { "type": "string" },
-          "requires": {
+          "requiresProfiles": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "requiresStacks": {
             "type": "array",
             "items": { "type": "string" }
           }
         },
-        "required": ["title", "description", "requires"],
+        "required": ["title", "description"],
+        "anyOf": [
+          { "required": ["requiresProfiles"] },
+          { "required": ["requiresStacks"] }
+        ],
         "additionalProperties": false
       }
     },

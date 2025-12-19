@@ -188,33 +188,27 @@
         ],
         "properties": {
           "profile": {
-            "const": "lite"
+            "const": "illustrated"
           }
         }
       },
       "then": {
-        "properties": {
-          "level": {
-            "const": "lite"
-          }
-        }
-      }
-    },
-    {
-      "if": {
         "required": [
-          "profile"
+          "stacks"
         ],
         "properties": {
-          "profile": {
-            "const": "base"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "level": {
-            "const": "base"
+          "stacks": {
+            "required": [
+              "illustrated"
+            ],
+            "properties": {
+              "illustrated": {
+                "type": "integer",
+                "enum": [
+                  1
+                ]
+              }
+            }
           }
         }
       }
@@ -242,15 +236,18 @@
             ],
             "properties": {
               "quantified": {
-                "const": 1
+                "type": "integer",
+                "enum": [
+                  1
+                ]
               },
               "scaling": {
-                "const": 1
+                "type": "integer",
+                "enum": [
+                  1
+                ]
               }
             }
-          },
-          "level": {
-            "const": "base"
           }
         }
       }
@@ -278,31 +275,259 @@
             ],
             "properties": {
               "structured": {
-                "const": 1
+                "type": "integer",
+                "enum": [
+                  1
+                ]
               },
               "timed": {
-                "const": 1
+                "type": "integer",
+                "enum": [
+                  1
+                ]
               }
             }
-          },
-          "level": {
-            "const": "base"
           }
         }
       }
     },
     {
       "if": {
+        "allOf": [
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "compute"
+                ],
+                "properties": {
+                  "compute": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "quantified"
+                ],
+                "properties": {
+                  "quantified": {
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "timed"
+                ],
+                "properties": {
+                  "timed": {
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {},
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "compute"
+              ],
+              "properties": {
+                "compute": {
+                  "type": "integer",
+                  "not": {
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
+      }
+    },
+    {
+      "if": {
         "required": [
-          "profile"
+          "stacks"
         ],
         "properties": {
-          "profile": {
-            "const": "illustrated"
+          "stacks": {
+            "required": [
+              "dietary"
+            ],
+            "properties": {
+              "dietary": {
+                "const": 1
+              }
+            }
           }
         }
       },
       "then": {
+        "properties": {
+          "dietary": {
+            "type": "object",
+            "properties": {
+              "basis": {
+                "type": "string",
+                "enum": [
+                  "perServing",
+                  "perRecipe"
+                ]
+              },
+              "calories": {
+                "type": "number",
+                "minimum": 0
+              },
+              "macros": {
+                "type": "object",
+                "properties": {
+                  "protein": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "fat": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "carbohydrates": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                },
+                "minProperties": 1,
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^x-": {
+                    "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+                  }
+                }
+              },
+              "diets": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "allergens": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "basis"
+            ],
+            "additionalProperties": false,
+            "anyOf": [
+              {
+                "required": [
+                  "calories"
+                ]
+              },
+              {
+                "required": [
+                  "macros"
+                ]
+              },
+              {
+                "required": [
+                  "diets"
+                ]
+              },
+              {
+                "required": [
+                  "allergens"
+                ]
+              }
+            ],
+            "patternProperties": {
+              "^x-": {
+                "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+              }
+            }
+          }
+        },
+        "required": [
+          "dietary"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "dietary"
+              ],
+              "properties": {
+                "dietary": {
+                  "type": "integer",
+                  "not": {
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
+      }
+    },
+    {
+      "if": {
         "required": [
           "stacks"
         ],
@@ -316,10 +541,63 @@
                 "const": 1
               }
             }
-          },
-          "level": {
-            "const": "base"
           }
+        }
+      },
+      "then": {
+        "properties": {
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "https://soustack.spec/defs/common.schema.json#/properties/uri"
+            }
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "https://soustack.spec/defs/common.schema.json#/properties/uri"
+            }
+          },
+          "instructions": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/illustrated@1_illustratedStep"
+                },
+                {
+                  "$ref": "#/$defs/illustrated@1_illustratedSection"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "illustrated"
+              ],
+              "properties": {
+                "illustrated": {
+                  "type": "integer",
+                  "not": {
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
         }
       }
     },
@@ -355,7 +633,10 @@
                   ],
                   "properties": {
                     "scaling": {
-                      "const": 1
+                      "type": "integer",
+                      "enum": [
+                        1
+                      ]
                     }
                   }
                 }
@@ -367,7 +648,17 @@
       "then": {
         "properties": {
           "ingredients": {
-            "$ref": "./stacks/quantified.schema.json#/properties/ingredients"
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/quantified@1_ingredient"
+                },
+                {
+                  "$ref": "#/$defs/quantified@1_ingredientSection"
+                }
+              ]
+            }
           }
         },
         "required": [
@@ -386,8 +677,115 @@
               ],
               "properties": {
                 "quantified": {
+                  "type": "integer",
                   "not": {
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
+      }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "referenced"
+                ],
+                "properties": {
+                  "referenced": {
                     "const": 1
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "structured"
+                ],
+                "properties": {
+                  "structured": {
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/referenced@1_ingredient"
+                },
+                {
+                  "$ref": "#/$defs/referenced@1_ingredientSection"
+                }
+              ]
+            }
+          },
+          "instructions": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/referenced@1_referencedStep"
+                },
+                {
+                  "$ref": "#/$defs/referenced@1_referencedSection"
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "ingredients",
+          "instructions"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "referenced"
+              ],
+              "properties": {
+                "referenced": {
+                  "type": "integer",
+                  "not": {
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -430,7 +828,10 @@
                 ],
                 "properties": {
                   "quantified": {
-                    "const": 1
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -441,10 +842,66 @@
       "then": {
         "properties": {
           "ingredients": {
-            "$ref": "./stacks/scaling.schema.json#/properties/ingredients"
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/scaling@1_ingredient"
+                },
+                {
+                  "$ref": "#/$defs/scaling@1_ingredientSection"
+                }
+              ]
+            }
           },
           "scaling": {
-            "$ref": "./stacks/scaling.schema.json#/properties/scaling"
+            "type": "object",
+            "properties": {
+              "discrete": {
+                "type": "object",
+                "properties": {
+                  "min": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "max": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "step": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                },
+                "required": [
+                  "min",
+                  "max"
+                ],
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^x-": {
+                    "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+                  }
+                }
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "discrete"
+            ],
+            "additionalProperties": false,
+            "patternProperties": {
+              "^x-": {
+                "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+              }
+            }
           }
         },
         "required": [
@@ -464,8 +921,105 @@
               ],
               "properties": {
                 "scaling": {
+                  "type": "integer",
                   "not": {
-                    "const": 1
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "not": {}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "stacks"
+        ],
+        "properties": {
+          "stacks": {
+            "required": [
+              "storage"
+            ],
+            "properties": {
+              "storage": {
+                "const": 1
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "storage": {
+            "type": "object",
+            "properties": {
+              "roomTemp": {
+                "$ref": "#/$defs/storage@1_storageMethod"
+              },
+              "refrigerated": {
+                "$ref": "#/$defs/storage@1_storageMethod"
+              },
+              "frozen": {
+                "$ref": "#/$defs/storage@1_storageMethod"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "roomTemp"
+                ]
+              },
+              {
+                "required": [
+                  "refrigerated"
+                ]
+              },
+              {
+                "required": [
+                  "frozen"
+                ]
+              }
+            ],
+            "additionalProperties": false,
+            "patternProperties": {
+              "^x-": {
+                "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+              }
+            }
+          }
+        },
+        "required": [
+          "storage"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "stacks"
+          ],
+          "properties": {
+            "stacks": {
+              "required": [
+                "storage"
+              ],
+              "properties": {
+                "storage": {
+                  "type": "integer",
+                  "not": {
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -498,9 +1052,22 @@
       "then": {
         "properties": {
           "instructions": {
-            "$ref": "./stacks/structured.schema.json#/properties/instructions"
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/structured@1_step"
+                },
+                {
+                  "$ref": "#/$defs/structured@1_stepSection"
+                }
+              ]
+            }
           }
-        }
+        },
+        "required": [
+          "instructions"
+        ]
       },
       "else": {
         "if": {
@@ -514,249 +1081,11 @@
               ],
               "properties": {
                 "structured": {
+                  "type": "integer",
                   "not": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "then": {
-          "not": {}
-        }
-      }
-    },
-    {
-      "if": {
-        "allOf": [
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
-                  "timed"
-                ],
-                "properties": {
-                  "timed": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          },
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
-                  "structured"
-                ],
-                "properties": {
-                  "structured": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        ]
-      },
-      "then": {
-        "properties": {
-          "instructions": {
-            "$ref": "./stacks/timed.schema.json#/properties/instructions"
-          }
-        }
-      },
-      "else": {
-        "if": {
-          "required": [
-            "stacks"
-          ],
-          "properties": {
-            "stacks": {
-              "required": [
-                "timed"
-              ],
-              "properties": {
-                "timed": {
-                  "not": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "then": {
-          "not": {}
-        }
-      }
-    },
-    {
-      "if": {
-        "allOf": [
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
-                  "referenced"
-                ],
-                "properties": {
-                  "referenced": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          },
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
-                  "structured"
-                ],
-                "properties": {
-                  "structured": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        ]
-      },
-      "then": {
-        "properties": {
-          "ingredients": {
-            "$ref": "./stacks/referenced.schema.json#/properties/ingredients"
-          },
-          "instructions": {
-            "$ref": "./stacks/referenced.schema.json#/properties/instructions"
-          }
-        },
-        "required": [
-          "ingredients",
-          "instructions"
-        ]
-      },
-      "else": {
-        "if": {
-          "required": [
-            "stacks"
-          ],
-          "properties": {
-            "stacks": {
-              "required": [
-                "referenced"
-              ],
-              "properties": {
-                "referenced": {
-                  "not": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "then": {
-          "not": {}
-        }
-      }
-    },
-    {
-      "if": {
-        "required": [
-          "stacks"
-        ],
-        "properties": {
-          "stacks": {
-            "required": [
-              "illustrated"
-            ],
-            "properties": {
-              "illustrated": {
-                "const": 1
-              }
-            }
-          }
-        }
-      },
-      "then": {},
-      "else": {
-        "if": {
-          "required": [
-            "stacks"
-          ],
-          "properties": {
-            "stacks": {
-              "required": [
-                "illustrated"
-              ],
-              "properties": {
-                "illustrated": {
-                  "not": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "then": {
-          "not": {}
-        }
-      }
-    },
-    {
-      "if": {
-        "required": [
-          "stacks"
-        ],
-        "properties": {
-          "stacks": {
-            "required": [
-              "dietary"
-            ],
-            "properties": {
-              "dietary": {
-                "const": 1
-              }
-            }
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "dietary"
-        ]
-      },
-      "else": {
-        "if": {
-          "required": [
-            "stacks"
-          ],
-          "properties": {
-            "stacks": {
-              "required": [
-                "dietary"
-              ],
-              "properties": {
-                "dietary": {
-                  "not": {
-                    "const": 1
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -799,7 +1128,10 @@
                 ],
                 "properties": {
                   "referenced": {
-                    "const": 1
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -808,6 +1140,63 @@
         ]
       },
       "then": {
+        "properties": {
+          "substitutions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "for": {
+                  "type": "string"
+                },
+                "alternatives": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "ratio": {
+                        "type": "string"
+                      },
+                      "metadata": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "ratio"
+                    ],
+                    "additionalProperties": false,
+                    "patternProperties": {
+                      "^x-": {
+                        "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+                      }
+                    }
+                  },
+                  "minItems": 1
+                },
+                "metadata": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "required": [
+                "for",
+                "alternatives"
+              ],
+              "additionalProperties": false,
+              "patternProperties": {
+                "^x-": {
+                  "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+                }
+              }
+            },
+            "minItems": 1
+          }
+        },
         "required": [
           "substitutions"
         ]
@@ -824,8 +1213,11 @@
               ],
               "properties": {
                 "substitutions": {
+                  "type": "integer",
                   "not": {
-                    "const": 1
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -856,6 +1248,40 @@
         }
       },
       "then": {
+        "properties": {
+          "techniques": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "metadata": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false,
+              "patternProperties": {
+                "^x-": {
+                  "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+                }
+              }
+            },
+            "minItems": 1
+          }
+        },
         "required": [
           "techniques"
         ]
@@ -872,56 +1298,11 @@
               ],
               "properties": {
                 "techniques": {
+                  "type": "integer",
                   "not": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "then": {
-          "not": {}
-        }
-      }
-    },
-    {
-      "if": {
-        "required": [
-          "stacks"
-        ],
-        "properties": {
-          "stacks": {
-            "required": [
-              "storage"
-            ],
-            "properties": {
-              "storage": {
-                "const": 1
-              }
-            }
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "storage"
-        ]
-      },
-      "else": {
-        "if": {
-          "required": [
-            "stacks"
-          ],
-          "properties": {
-            "stacks": {
-              "required": [
-                "storage"
-              ],
-              "properties": {
-                "storage": {
-                  "not": {
-                    "const": 1
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -943,40 +1324,6 @@
             "properties": {
               "stacks": {
                 "required": [
-                  "compute"
-                ],
-                "properties": {
-                  "compute": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          },
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
-                  "quantified"
-                ],
-                "properties": {
-                  "quantified": {
-                    "const": 1
-                  }
-                }
-              }
-            }
-          },
-          {
-            "required": [
-              "stacks"
-            ],
-            "properties": {
-              "stacks": {
-                "required": [
                   "timed"
                 ],
                 "properties": {
@@ -986,15 +1333,49 @@
                 }
               }
             }
+          },
+          {
+            "required": [
+              "stacks"
+            ],
+            "properties": {
+              "stacks": {
+                "required": [
+                  "structured"
+                ],
+                "properties": {
+                  "structured": {
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
           }
-        ],
-        "properties": {
-          "level": {
-            "const": "base"
-          }
-        }
+        ]
       },
-      "then": {},
+      "then": {
+        "properties": {
+          "instructions": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/timed@1_timedStep"
+                },
+                {
+                  "$ref": "#/$defs/timed@1_timedStepSection"
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "instructions"
+        ]
+      },
       "else": {
         "if": {
           "required": [
@@ -1003,12 +1384,15 @@
           "properties": {
             "stacks": {
               "required": [
-                "compute"
+                "timed"
               ],
               "properties": {
-                "compute": {
+                "timed": {
+                  "type": "integer",
                   "not": {
-                    "const": 1
+                    "enum": [
+                      1
+                    ]
                   }
                 }
               }
@@ -1126,6 +1510,400 @@
       "patternProperties": {
         "^x-": {
           "$ref": "./defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "illustrated@1_illustratedStep": {
+      "allOf": [
+        {
+          "$ref": "https://soustack.spec/defs/entities.schema.json#/$defs/StepBase"
+        },
+        {
+          "required": [
+            "id"
+          ]
+        }
+      ]
+    },
+    "illustrated@1_illustratedSection": {
+      "type": "object",
+      "properties": {
+        "section": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "https://soustack.spec/stacks/illustrated.schema.json#/$defs/illustratedStep"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "section",
+        "steps"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "quantified@1_ingredient": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "quantity": {
+          "$ref": "https://soustack.spec/defs/quantity.schema.json"
+        },
+        "temperature": {
+          "$ref": "https://soustack.spec/defs/temperature.schema.json"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "quantity"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "quantified@1_ingredientSection": {
+      "type": "object",
+      "properties": {
+        "section": {
+          "type": "string"
+        },
+        "ingredients": {
+          "type": "array",
+          "items": {
+            "$ref": "https://soustack.spec/stacks/quantified.schema.json#/$defs/ingredient"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "section",
+        "ingredients"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "referenced@1_ingredient": {
+      "allOf": [
+        {
+          "$ref": "https://soustack.spec/defs/entities.schema.json#/$defs/IngredientBase"
+        },
+        {
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "referenced@1_ingredientSection": {
+      "type": "object",
+      "properties": {
+        "section": {
+          "type": "string"
+        },
+        "ingredients": {
+          "type": "array",
+          "items": {
+            "$ref": "https://soustack.spec/stacks/referenced.schema.json#/$defs/ingredient"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "section",
+        "ingredients"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "referenced@1_referencedStep": {
+      "allOf": [
+        {
+          "$ref": "https://soustack.spec/defs/entities.schema.json#/$defs/StepBase"
+        },
+        {
+          "properties": {
+            "inputs": {
+              "allOf": [
+                {
+                  "$ref": "https://soustack.spec/defs/entities.schema.json#/$defs/StepBase/properties/inputs"
+                },
+                {
+                  "minItems": 1
+                }
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "inputs"
+          ]
+        }
+      ]
+    },
+    "referenced@1_referencedSection": {
+      "type": "object",
+      "properties": {
+        "section": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "https://soustack.spec/stacks/referenced.schema.json#/$defs/referencedStep"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "section",
+        "steps"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "scaling@1_ingredient": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "quantity": {
+          "$ref": "https://soustack.spec/defs/quantity.schema.json"
+        },
+        "temperature": {
+          "$ref": "https://soustack.spec/defs/temperature.schema.json"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "scaling": {
+          "$ref": "https://soustack.spec/defs/scalingRule.schema.json"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "quantity"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "scaling@1_ingredientSection": {
+      "type": "object",
+      "properties": {
+        "section": {
+          "type": "string"
+        },
+        "ingredients": {
+          "type": "array",
+          "items": {
+            "$ref": "https://soustack.spec/stacks/scaling.schema.json#/$defs/ingredient"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "section",
+        "ingredients"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "storage@1_storageMethod": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "$ref": "https://soustack.spec/defs/duration.schema.json#/properties/StorageDuration"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "duration"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "structured@1_step": {
+      "allOf": [
+        {
+          "$ref": "https://soustack.spec/defs/entities.schema.json#/$defs/StepBase"
+        },
+        {
+          "required": [
+            "id"
+          ]
+        }
+      ]
+    },
+    "structured@1_stepSection": {
+      "type": "object",
+      "properties": {
+        "section": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "https://soustack.spec/stacks/structured.schema.json#/$defs/step"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "section",
+        "steps"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
+        }
+      }
+    },
+    "timed@1_timedStep": {
+      "allOf": [
+        {
+          "$ref": "https://soustack.spec/defs/entities.schema.json#/$defs/StepBase"
+        },
+        {
+          "properties": {
+            "timing": {
+              "allOf": [
+                {
+                  "$ref": "https://soustack.spec/defs/entities.schema.json#/$defs/StepBase/properties/timing"
+                },
+                {
+                  "required": [
+                    "activity"
+                  ],
+                  "anyOf": [
+                    {
+                      "required": [
+                        "duration"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "completionCue"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "timing"
+          ]
+        }
+      ]
+    },
+    "timed@1_timedStepSection": {
+      "type": "object",
+      "properties": {
+        "section": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "https://soustack.spec/stacks/timed.schema.json#/$defs/timedStep"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "section",
+        "steps"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "https://soustack.spec/defs/common.schema.json#/properties/extensionLaneValue"
         }
       }
     }

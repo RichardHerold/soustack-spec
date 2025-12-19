@@ -9,12 +9,21 @@ const repoRoot = join(__dirname, '..');
 
 function generateProfilesTable(registry) {
   const rows = [];
-  rows.push('| Profile | Description | Requires |');
-  rows.push('| ------- | ----------- | -------- |');
+  rows.push('| Profile | Requires Profiles | Requires Stacks | Description |');
+  rows.push('| ------- | ---------------- | -------------- | ----------- |');
   
-  for (const [id, profile] of Object.entries(registry.profiles)) {
-    const requires = profile.requires.length > 0 ? profile.requires.join(', ') : '—';
-    rows.push(`| **${profile.title}** | ${profile.description} | ${requires} |`);
+  // Sort profiles for deterministic output
+  const profileIds = Object.keys(registry.profiles).sort();
+  
+  for (const id of profileIds) {
+    const profile = registry.profiles[id];
+    const requiresProfiles = (profile.requiresProfiles || []).length > 0 
+      ? profile.requiresProfiles.join(', ') 
+      : '—';
+    const requiresStacks = (profile.requiresStacks || []).length > 0 
+      ? profile.requiresStacks.join(', ') 
+      : '—';
+    rows.push(`| **${profile.title}** | ${requiresProfiles} | ${requiresStacks} | ${profile.description} |`);
   }
   
   return rows.join('\n');
@@ -25,7 +34,11 @@ function generateStacksTable(registry) {
   rows.push('| Stack ID | Latest Major | Requires | Profile | Schema | Docs |');
   rows.push('| -------- | ----------- | -------- | ------- | ------ | ---- |');
   
-  for (const [id, stack] of Object.entries(registry.stacks)) {
+  // Sort stacks alphabetically for deterministic output
+  const stackIds = Object.keys(registry.stacks).sort();
+  
+  for (const id of stackIds) {
+    const stack = registry.stacks[id];
     const requires = stack.requires.length > 0 ? stack.requires.join(', ') : '—';
     const schemaPath = stack.schema.major[String(stack.latestMajor)] || '—';
     const docPath = stack.docs?.major?.[String(stack.latestMajor)] || '—';

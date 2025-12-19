@@ -250,28 +250,28 @@ MIT
 
 ## Profiles
 
-| Profile | Description | Requires |
-| ------- | ----------- | -------- |
-| **Base** | name, ingredients, instructions | — |
-| **Lite** | Minimal publishable recipe | base |
-| **Scalable** | Quantified + scaling | lite |
-| **Timed** | Structured + timed | lite |
-| **Illustrated** | Media present | lite |
+| Profile | Requires Profiles | Requires Stacks | Description |
+| ------- | ---------------- | -------------- | ----------- |
+| **Base** | — | — | name, ingredients, instructions |
+| **Illustrated** | lite | illustrated | Media present |
+| **Lite** | base | — | Minimal publishable recipe |
+| **Scalable** | lite | quantified, scaling | Quantified + scaling |
+| **Timed** | lite | structured, timed | Structured + timed |
 
 ## Stacks
 
 | Stack ID | Latest Major | Requires | Profile | Schema | Docs |
 | -------- | ----------- | -------- | ------- | ------ | ---- |
-| **quantified** | 1 | — | scalable | `stacks/quantified.schema.json` | — |
-| **scaling** | 1 | quantified | scalable | `stacks/scaling.schema.json` | `stacks/scaling@1.md` |
-| **structured** | 1 | — | timed | `stacks/structured.schema.json` | — |
-| **timed** | 1 | structured | timed | `stacks/timed.schema.json` | — |
-| **referenced** | 1 | structured | timed | `stacks/referenced.schema.json` | — |
-| **illustrated** | 1 | — | illustrated | `stacks/illustrated.schema.json` | — |
+| **compute** | 1 | quantified, timed | lite | `stacks/compute.schema.json` | — |
 | **dietary** | 1 | — | lite | `stacks/dietary.schema.json` | — |
+| **illustrated** | 1 | — | illustrated | `stacks/illustrated.schema.json` | — |
+| **quantified** | 1 | — | scalable | `stacks/quantified.schema.json` | — |
+| **referenced** | 1 | structured | timed | `stacks/referenced.schema.json` | — |
+| **scaling** | 1 | quantified | scalable | `stacks/scaling.schema.json` | `stacks/scaling@1.md` |
+| **storage** | 1 | — | lite | `stacks/storage.schema.json` | — |
+| **structured** | 1 | — | timed | `stacks/structured.schema.json` | — |
 | **substitutions** | 1 | referenced | lite | `stacks/substitutions.schema.json` | — |
 | **techniques** | 1 | — | lite | `stacks/techniques.schema.json` | — |
-| **storage** | 1 | — | lite | `stacks/storage.schema.json` | — |
-| **compute** | 1 | quantified, timed | lite | `stacks/compute.schema.json` | — |
+| **timed** | 1 | structured | timed | `stacks/timed.schema.json` | — |
 
 <!-- END GENERATED: STACK REGISTRY -->
