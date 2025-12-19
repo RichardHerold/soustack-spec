@@ -253,29 +253,6 @@ async function generateStackGatingRule(stackId, stack, registry, allDefs) {
       ...prerequisiteConditions
     ];
     
-    // Special case: quantified should NOT apply when scaling is present
-    // (scaling includes quantified, so we don't want both rules to apply)
-    if (stackId === 'quantified') {
-      ifConditions.push({
-        not: {
-          required: ['stacks'],
-          properties: {
-            stacks: {
-              required: ['scaling'],
-              properties: {
-                scaling: {
-                  type: 'integer',
-                  enum: Object.keys(registry.stacks.scaling?.schema.major || {})
-                    .map(m => parseInt(m, 10))
-                    .sort((a, b) => a - b)
-                }
-              }
-            }
-          }
-        }
-      });
-    }
-    
     const ifCondition = ifConditions.length === 1 
       ? ifConditions[0] 
       : { allOf: ifConditions };
