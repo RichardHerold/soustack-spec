@@ -35,7 +35,12 @@
         "section": { "type": "string" },
         "steps": {
           "type": "array",
-          "items": { "$ref": "#/$defs/illustratedStep" }
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/illustratedStep" },
+              { "$ref": "#/$defs/illustratedSection" }
+            ]
+          }
         },
         "metadata": { "type": "object", "additionalProperties": true }
       },

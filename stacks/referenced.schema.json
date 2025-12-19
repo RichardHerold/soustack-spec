@@ -32,8 +32,7 @@
       "allOf": [
         { "$ref": "../defs/entities.schema.json#/$defs/IngredientBase" },
         { "required": ["id"] }
-      ],
-      "unevaluatedProperties": false
+      ]
     },
     "ingredientSection": {
       "type": "object",
@@ -41,7 +40,12 @@
         "section": { "type": "string" },
         "ingredients": {
           "type": "array",
-          "items": { "$ref": "#/$defs/ingredient" }
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/ingredient" },
+              { "$ref": "#/$defs/ingredientSection" }
+            ]
+          }
         },
         "metadata": { "type": "object", "additionalProperties": true }
       },
@@ -73,7 +77,12 @@
         "section": { "type": "string" },
         "steps": {
           "type": "array",
-          "items": { "$ref": "#/$defs/referencedStep" }
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/referencedStep" },
+              { "$ref": "#/$defs/referencedSection" }
+            ]
+          }
         },
         "metadata": { "type": "object", "additionalProperties": true }
       },

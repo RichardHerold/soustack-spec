@@ -41,7 +41,12 @@
         "section": { "type": "string" },
         "steps": {
           "type": "array",
-          "items": { "$ref": "#/$defs/timedStep" }
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/timedStep" },
+              { "$ref": "#/$defs/timedStepSection" }
+            ]
+          }
         },
         "metadata": { "type": "object", "additionalProperties": true }
       },

@@ -39,7 +39,12 @@
         "section": { "type": "string" },
         "ingredients": {
           "type": "array",
-          "items": { "$ref": "#/$defs/ingredient" }
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/ingredient" },
+              { "$ref": "#/$defs/ingredientSection" }
+            ]
+          }
         },
         "metadata": { "type": "object", "additionalProperties": true }
       },
