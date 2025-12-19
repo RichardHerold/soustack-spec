@@ -438,12 +438,32 @@ function generateProfileValidation(registry) {
   return profileRules;
 }
 
+/**
+ * Update the profile property enum in the schema to match registry
+ * Option 2: Allow vendor profiles (x-*) since vendor stacks are supported
+ */
+function updateProfileEnum(schema, registry) {
+  const profileIds = Object.keys(registry.profiles).sort();
+  
+  // Option 2: Allow official profiles + vendor profiles
+  schema.properties.profile = {
+    type: 'string',
+    anyOf: [
+      { enum: profileIds },
+      { pattern: '^x-[a-z0-9-]+(?:\\.[a-z0-9-]+)*$' }
+    ]
+  };
+}
+
 async function main() {
   const registryPath = join(repoRoot, 'stacks', 'registry.json');
   const schemaPath = join(repoRoot, 'soustack.schema.json');
 
   const registry = JSON.parse(await readFile(registryPath, 'utf8'));
   const schema = JSON.parse(await readFile(schemaPath, 'utf8'));
+
+  // Update profile enum from registry
+  updateProfileEnum(schema, registry);
 
   // Generate gating rules and collect $defs
   const { rules: gatingRules, defs: stackDefs } = await generateStackGating(registry);

@@ -85,6 +85,23 @@ function getStacksSet(stacksMap) {
   return set;
 }
 
+/**
+ * Check if a stack is present with any supported major version
+ */
+function hasStackVersion(stacksMap, stackId, registry) {
+  if (!(stackId in stacksMap)) {
+    return false;
+  }
+  const declaredMajor = stacksMap[stackId];
+  const stack = registry.stacks[stackId];
+  if (!stack) {
+    return false;
+  }
+  const supportedMajors = Object.keys(stack.schema.major)
+    .map(m => parseInt(m, 10));
+  return supportedMajors.includes(declaredMajor);
+}
+
 function collectIngredients(ingredients = []) {
   const list = [];
   for (const item of ingredients) {
@@ -190,13 +207,23 @@ function checkConformance(data, file, reg) {
       continue;
     }
     const stack = reg.stacks[stackId];
-    if (major !== stack.latestMajor) {
-      errors.push(`Stack "${stackId}" major ${major} not supported (latest: ${stack.latestMajor})`);
+    // Check if declared major is in supported majors
+    const supportedMajors = Object.keys(stack.schema.major)
+      .map(m => parseInt(m, 10));
+    if (!supportedMajors.includes(major)) {
+      errors.push(`Stack "${stackId}" major ${major} not supported (supported: ${supportedMajors.join(', ')})`);
     }
-    // Check prerequisites
+    // Check prerequisites - prereq must exist AND be a supported major
     for (const req of stack.requires) {
-      if (!(req in stacksMap) || stacksMap[req] !== 1) {
-        errors.push(`Stack "${stackId}" requires "${req}@1" but it is not present`);
+      if (!hasStackVersion(stacksMap, req, reg)) {
+        const reqStack = reg.stacks[req];
+        if (!reqStack) {
+          errors.push(`Stack "${stackId}" requires missing stack: "${req}"`);
+        } else {
+          const reqSupportedMajors = Object.keys(reqStack.schema.major)
+            .map(m => parseInt(m, 10));
+          errors.push(`Stack "${stackId}" requires "${req}" with a supported major (${reqSupportedMajors.join(', ')}) but it is not present`);
+        }
       }
     }
   }
@@ -227,12 +254,12 @@ function checkConformance(data, file, reg) {
     if (dup) errors.push(dup);
   }
 
-  if (stacks.has('structured@1') || stacks.has('timed@1') || stacks.has('referenced@1')) {
+  if (hasStackVersion(stacksMap, 'structured', reg) || hasStackVersion(stacksMap, 'timed', reg) || hasStackVersion(stacksMap, 'referenced', reg)) {
     const dagIssue = validateDAG(steps);
     if (dagIssue) errors.push(dagIssue);
   }
 
-  if (stacks.has('referenced@1')) {
+  if (hasStackVersion(stacksMap, 'referenced', reg)) {
     const ids = new Set(ingredients.map((i) => i.id));
     for (const step of steps) {
       if (!Array.isArray(step.inputs) || step.inputs.length === 0) {
@@ -245,7 +272,7 @@ function checkConformance(data, file, reg) {
     }
   }
 
-  if (stacks.has('timed@1')) {
+  if (hasStackVersion(stacksMap, 'timed', reg)) {
     for (const step of steps) {
       const duration = step?.timing?.duration;
       if (duration && typeof duration === 'object' && 'minMinutes' in duration && 'maxMinutes' in duration) {
@@ -256,13 +283,13 @@ function checkConformance(data, file, reg) {
     }
   }
 
-  if (stacks.has('compute@1')) {
-    if (data.level !== 'base' || !stacks.has('quantified@1') || !stacks.has('timed@1')) {
+  if (hasStackVersion(stacksMap, 'compute', reg)) {
+    if (data.level !== 'base' || !hasStackVersion(stacksMap, 'quantified', reg) || !hasStackVersion(stacksMap, 'timed', reg)) {
       errors.push('compute stack requires base level with quantified and timed stacks');
     }
   }
 
-  if (stacks.has('scaling@1')) {
+  if (hasStackVersion(stacksMap, 'scaling', reg)) {
     const ingredientIds = new Set(ingredients.map((i) => i.id));
     for (const ingredient of ingredients) {
       const scaling = ingredient?.scaling;
@@ -284,8 +311,8 @@ function checkConformance(data, file, reg) {
     }
   }
 
-  if (stacks.has('illustrated@1')) {
-    const stepHasMedia = steps.some((s) => Array.isArray(s.images)?.length || Array.isArray(s.videos)?.length);
+  if (hasStackVersion(stacksMap, 'illustrated', reg)) {
+    const stepHasMedia = steps.some((s) => (Array.isArray(s.images) && s.images.length > 0) || (Array.isArray(s.videos) && s.videos.length > 0));
     const recipeHasMedia = (Array.isArray(data.images) && data.images.length > 0) ||
       (Array.isArray(data.videos) && data.videos.length > 0);
     if (!stepHasMedia && !recipeHasMedia) {
@@ -293,7 +320,7 @@ function checkConformance(data, file, reg) {
     }
   }
 
-  if (stacks.has('dietary@1')) {
+  if (hasStackVersion(stacksMap, 'dietary', reg)) {
     if (!data.dietary) {
       errors.push('dietary block missing');
     } else {
@@ -306,7 +333,7 @@ function checkConformance(data, file, reg) {
     }
   }
 
-  if (stacks.has('techniques@1')) {
+  if (hasStackVersion(stacksMap, 'techniques', reg)) {
     const glossary = Array.isArray(data.techniques) ? data.techniques : [];
     const glossaryIds = new Set(glossary.map((t) => t.id));
     for (const step of steps) {
@@ -317,7 +344,7 @@ function checkConformance(data, file, reg) {
     if (glossary.length === 0) errors.push('techniques stack requires glossary');
   }
 
-  if (stacks.has('storage@1')) {
+  if (hasStackVersion(stacksMap, 'storage', reg)) {
     const storage = data.storage || {};
     const methods = ['roomTemp', 'refrigerated', 'frozen'];
     const present = methods.filter((m) => storage[m]);
