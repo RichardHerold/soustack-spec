@@ -357,6 +357,67 @@ function checkConformance(data, file, reg) {
     }
   }
 
+  if (hasStackVersion(stacksMap, 'equipment', reg)) {
+    const equipment = data.equipment || [];
+    const equipmentIds = new Set();
+    const equipmentObjects = [];
+    
+    // Collect equipment ids from structured objects
+    for (const item of equipment) {
+      if (item && typeof item === 'object' && item.id) {
+        if (equipmentIds.has(item.id)) {
+          errors.push(`equipment id duplicated: ${item.id}`);
+        }
+        equipmentIds.add(item.id);
+        equipmentObjects.push(item);
+      }
+    }
+    
+    // Validate step equipment references when structured is present
+    if (hasStackVersion(stacksMap, 'structured', reg)) {
+      for (const step of steps) {
+        if (Array.isArray(step.usesEquipment)) {
+          for (const eqId of step.usesEquipment) {
+            if (!equipmentIds.has(eqId)) {
+              errors.push(`step usesEquipment references missing equipment id: ${eqId}`);
+            }
+          }
+        }
+      }
+    }
+    
+    // Validate equipment scaling fields
+    for (const item of equipmentObjects) {
+      // Validate threshold countScaling
+      if (item.countScaling && typeof item.countScaling === 'object' && item.countScaling.mode === 'threshold') {
+        const steps = item.countScaling.steps || [];
+        if (steps.length === 0) {
+          errors.push(`equipment ${item.id} threshold countScaling requires non-empty steps array`);
+        }
+        for (const step of steps) {
+          if (step.maxFactor <= 0) {
+            errors.push(`equipment ${item.id} threshold step maxFactor must be > 0`);
+          }
+          if (step.count < 1) {
+            errors.push(`equipment ${item.id} threshold step count must be >= 1`);
+          }
+        }
+      }
+      
+      // Validate upgrades references
+      if (Array.isArray(item.upgrades)) {
+        for (const upgrade of item.upgrades) {
+          if (upgrade.minFactor <= 0) {
+            errors.push(`equipment ${item.id} upgrade minFactor must be > 0`);
+          }
+          if (!upgrade.use || !equipmentIds.has(upgrade.use)) {
+            errors.push(`equipment ${item.id} upgrade references missing equipment id: ${upgrade.use || ''}`.trim());
+          }
+        }
+      }
+    }
+  }
+
   return errors;
 }
 

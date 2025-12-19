@@ -215,6 +215,8 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 Stacks define capability-specific structural and semantic requirements. Each stack is versioned and defined in its own schema and documentation.
 
+High-value optional stacks include `equipment@1` for declaring required equipment with scaling-aware counts and step-level usage references.
+
 ---
 
 ## 6. Semantic Validation
@@ -270,6 +272,7 @@ Non-normative guidance, examples, and adoption notes MAY be published separately
 | -------- | ----------- | -------- | ------- | ------ | ---- |
 | **compute** | 1 | quantified, timed | lite | `stacks/compute.schema.json` | — |
 | **dietary** | 1 | — | lite | `stacks/dietary.schema.json` | — |
+| **equipment** | 1 | — | lite | `stacks/equipment.schema.json` | `stacks/equipment@1.md` |
 | **illustrated** | 1 | — | illustrated | `stacks/illustrated.schema.json` | — |
 | **quantified** | 1 | — | scalable | `stacks/quantified.schema.json` | — |
 | **referenced** | 1 | structured | timed | `stacks/referenced.schema.json` | — |

@@ -91,6 +91,14 @@
       "profile": "lite",
       "requires": ["quantified", "timed"],
       "schema": { "major": { "1": "stacks/compute.schema.json" } }
+    },
+    "equipment": {
+      "title": "Equipment",
+      "latestMajor": 1,
+      "profile": "lite",
+      "requires": [],
+      "schema": { "major": { "1": "stacks/equipment.schema.json" } },
+      "docs": { "major": { "1": "stacks/equipment@1.md" } }
     }
   }
 }
