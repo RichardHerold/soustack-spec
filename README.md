@@ -264,6 +264,7 @@ MIT
 | -------- | ----------- | -------- | ------- | ------ | ---- |
 | **compute** | 1 | quantified, timed | lite | `stacks/compute.schema.json` | — |
 | **dietary** | 1 | — | lite | `stacks/dietary.schema.json` | — |
+| **equipment** | 1 | — | lite | `stacks/equipment.schema.json` | `stacks/equipment@1.md` |
 | **illustrated** | 1 | — | illustrated | `stacks/illustrated.schema.json` | — |
 | **quantified** | 1 | — | scalable | `stacks/quantified.schema.json` | — |
 | **referenced** | 1 | structured | timed | `stacks/referenced.schema.json` | — |
