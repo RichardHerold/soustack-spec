@@ -47,7 +47,7 @@ Profiles support an **adoption ladder**: publishers can start at **Lite** with m
 
 ### 3.2 Stack Semantics
 
-If a document declares a stack in `stacks[]`, it MUST satisfy all requirements of that stack as defined by this specification.
+If a document declares a stack in the `stacks` map (e.g., `"stacks": { "timed": 1 }`), it MUST satisfy all requirements of that stack as defined by this specification.
 
 Stacks that impose no additional structural or semantic requirements are not permitted in future major versions.
 
@@ -90,7 +90,7 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `stacks[]` MUST include `illustrated@1`.
+* `stacks.illustrated` MUST be `1`.
 
 **Semantic Requirements**
 
@@ -104,7 +104,7 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `stacks[]` MUST include `equipment@1`.
+* `stacks.equipment` MUST be `1`.
 
 ---
 
@@ -114,7 +114,7 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `stacks[]` MUST include `prep@1`.
+* `stacks.prep` MUST be `1`.
 
 ---
 
@@ -124,7 +124,7 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `stacks[]` MUST include `structured@1` and `timed@1`.
+* `stacks.structured` MUST be `1` and `stacks.timed` MUST be `1`.
 
 ---
 
@@ -134,7 +134,7 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `stacks[]` MUST include `quantified@1` and `scaling@1`.
+* `stacks.quantified` MUST be `1` and `stacks.scaling` MUST be `1`.
 
 **Semantic Requirements**
 

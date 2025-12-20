@@ -90,7 +90,7 @@ Example:
 ```json
 {
   "profile": "scalable",
-  "stacks": ["quantified@1", "scaling@1"],
+  "stacks": { "quantified": 1, "scaling": 1 },
   "yield": { "amount": 4, "unit": "servings" },
   "time": { "total": { "minutes": 30 } }
 }
