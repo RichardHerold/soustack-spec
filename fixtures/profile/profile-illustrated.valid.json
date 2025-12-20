@@ -21,6 +21,9 @@
     "bread"
   ],
   "instructions": [
-    "Toast the bread."
+    {
+      "id": "step-1",
+      "text": "Toast the bread."
+    }
   ]
 }
