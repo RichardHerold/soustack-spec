@@ -101,33 +101,25 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 ---
 
-### Profile: Structured
+### Profile: Equipped
 
-**Purpose:** Stable structure and node identity.
+**Purpose:** Declare required tools/equipment.
 
 **Requirements**
 
 * `level` MUST be `base`.
-* `stacks[]` MUST include `structured@1`.
-
-**Guarantees**
-
-* Ingredients and steps are objects with stable IDs.
+* `stacks[]` MUST include `equipment@1`.
 
 ---
 
-### Profile: Referenced
+### Profile: Prepped
 
-**Purpose:** Explicit linkage between steps and ingredients.
+**Purpose:** Prep guidance and/or mise en place tasks.
 
 **Requirements**
 
 * `level` MUST be `base`.
-* `stacks[]` MUST include `structured@1` and `referenced@1`.
-
-**Semantic Requirements**
-
-* All references MUST resolve.
+* `stacks[]` MUST include `prep@1`.
 
 ---
 
@@ -139,32 +131,6 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 * `level` MUST be `base`.
 * `stacks[]` MUST include `structured@1` and `timed@1`.
-
----
-
-### Profile: Schedulable
-
-**Purpose:** Deterministic scheduling.
-
-**Requirements**
-
-* `level` MUST be `base`.
-* `stacks[]` MUST include `structured@1` and `timed@1`.
-
-**Semantic Requirements**
-
-* Dependency graph MUST be acyclic.
-
----
-
-### Profile: Quantified
-
-**Purpose:** Machine-readable quantities.
-
-**Requirements**
-
-* `level` MUST be `base`.
-* `stacks[]` MUST include `quantified@1`.
 
 ---
 
@@ -181,33 +147,6 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 * Baker's percentage references MUST resolve to declared ingredient ids.
 * Discrete scaling ranges MUST have `min` less than or equal to `max`.
-
----
-
-### Profile: Nutrition
-
-**Requirements**
-
-* `level` MUST be `base`.
-* `stacks[]` MUST include `nutrition@1`.
-
----
-
-### Profile: Dietary
-
-**Requirements**
-
-* `level` MUST be `base`.
-* `stacks[]` MUST include `dietary@1`.
-
----
-
-### Profile: Storage
-
-**Requirements**
-
-* `level` MUST be `base`.
-* `stacks[]` MUST include `storage@1`.
 
 ---
 
@@ -235,7 +174,6 @@ In addition to schema validation, conforming tools MUST enforce semantic rules, 
 Validators MAY emit derived badges such as:
 
 * **Computable**
-* **Schedulable**
 * **Scalable**
 
 Badges are informative and do not replace profile conformance.
@@ -260,13 +198,13 @@ Non-normative guidance, examples, and adoption notes MAY be published separately
 
 | Profile | Requires Profiles | Requires Stacks | Description |
 | ------- | ---------------- | -------------- | ----------- |
-| **Base** | — | — | name, ingredients, instructions |
-| **Equipped** | lite | equipment | Recipe declares required tools/equipment. |
-| **Illustrated** | lite | illustrated | Media present |
-| **Lite** | base | — | Minimal publishable recipe |
-| **Prepped** | lite | prep | Recipe includes prep guidance and/or mise en place tasks. |
-| **Scalable** | lite | quantified, scaling | Quantified + scaling |
-| **Timed** | lite | structured, timed | Structured + timed |
+| **Base** | lite | — | Minimum cookable baseline |
+| **Equipped** | base | equipment | Recipe declares required tools/equipment. |
+| **Illustrated** | base | illustrated | Media present |
+| **Lite** | — | — | Lowest-friction publishing |
+| **Prepped** | base | prep | Recipe includes prep guidance and/or mise en place tasks. |
+| **Scalable** | base | quantified, scaling | Quantified + scaling |
+| **Timed** | base | structured, timed | Structured + timed |
 
 ## Stacks
 

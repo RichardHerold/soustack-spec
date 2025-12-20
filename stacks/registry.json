@@ -7,13 +7,13 @@
     "canonicalStacksFormat": "map"
   },
   "profiles": {
-    "base": { "title": "Base", "description": "name, ingredients, instructions", "requiresProfiles": [], "requiresStacks": [] },
-    "lite": { "title": "Lite", "description": "Minimal publishable recipe", "requiresProfiles": ["base"], "requiresStacks": [] },
-    "scalable": { "title": "Scalable", "description": "Quantified + scaling", "requiresProfiles": ["lite"], "requiresStacks": ["quantified", "scaling"] },
-    "timed": { "title": "Timed", "description": "Structured + timed", "requiresProfiles": ["lite"], "requiresStacks": ["structured", "timed"] },
-    "illustrated": { "title": "Illustrated", "description": "Media present", "requiresProfiles": ["lite"], "requiresStacks": ["illustrated"] },
-    "equipped": { "title": "Equipped", "description": "Recipe declares required tools/equipment.", "requiresProfiles": ["lite"], "requiresStacks": ["equipment"] },
-    "prepped": { "title": "Prepped", "description": "Recipe includes prep guidance and/or mise en place tasks.", "requiresProfiles": ["lite"], "requiresStacks": ["prep"] }
+    "lite": { "title": "Lite", "description": "Lowest-friction publishing", "requiresProfiles": [], "requiresStacks": [] },
+    "base": { "title": "Base", "description": "Minimum cookable baseline", "requiresProfiles": ["lite"], "requiresStacks": [] },
+    "scalable": { "title": "Scalable", "description": "Quantified + scaling", "requiresProfiles": ["base"], "requiresStacks": ["quantified", "scaling"] },
+    "timed": { "title": "Timed", "description": "Structured + timed", "requiresProfiles": ["base"], "requiresStacks": ["structured", "timed"] },
+    "illustrated": { "title": "Illustrated", "description": "Media present", "requiresProfiles": ["base"], "requiresStacks": ["illustrated"] },
+    "equipped": { "title": "Equipped", "description": "Recipe declares required tools/equipment.", "requiresProfiles": ["base"], "requiresStacks": ["equipment"] },
+    "prepped": { "title": "Prepped", "description": "Recipe includes prep guidance and/or mise en place tasks.", "requiresProfiles": ["base"], "requiresStacks": ["prep"] }
   },
   "stacks": {
     "quantified": {

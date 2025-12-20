@@ -60,7 +60,7 @@ Examples:
 
 * “We publish **Base** Soustack”
 * “This site supports **Scalable** recipes”
-* “Our embed works for **Schedulable** recipes”
+* “Our embed works for **Timed** recipes”
 
 Profiles define:
 
@@ -75,13 +75,11 @@ Profiles are defined normatively in **SPEC.md**.
 | ----------------------------- | -------------------------------------- |
 | Lite                          | Lowest-friction publishing             |
 | Base                          | Minimum cookable baseline              |
-| Structured                    | Stable IDs and sections                |
-| Referenced                    | Steps explicitly reference ingredients |
 | Timed                         | Step-level timing                      |
-| Schedulable                   | Dependency graph + timing              |
-| Quantified                    | Machine-readable quantities            |
 | Scalable                      | Interoperable scaling rules            |
-| Illustrated / Nutrition / Dietary / Storage | Optional enrichment                    |
+| Illustrated                   | Media present                          |
+| Equipped                      | Required tools/equipment               |
+| Prepped                       | Prep guidance and/or mise en place      |
 
 ---
 
@@ -252,13 +250,13 @@ MIT
 
 | Profile | Requires Profiles | Requires Stacks | Description |
 | ------- | ---------------- | -------------- | ----------- |
-| **Base** | — | — | name, ingredients, instructions |
-| **Equipped** | lite | equipment | Recipe declares required tools/equipment. |
-| **Illustrated** | lite | illustrated | Media present |
-| **Lite** | base | — | Minimal publishable recipe |
-| **Prepped** | lite | prep | Recipe includes prep guidance and/or mise en place tasks. |
-| **Scalable** | lite | quantified, scaling | Quantified + scaling |
-| **Timed** | lite | structured, timed | Structured + timed |
+| **Base** | lite | — | Minimum cookable baseline |
+| **Equipped** | base | equipment | Recipe declares required tools/equipment. |
+| **Illustrated** | base | illustrated | Media present |
+| **Lite** | — | — | Lowest-friction publishing |
+| **Prepped** | base | prep | Recipe includes prep guidance and/or mise en place tasks. |
+| **Scalable** | base | quantified, scaling | Quantified + scaling |
+| **Timed** | base | structured, timed | Structured + timed |
 
 ## Stacks
 
