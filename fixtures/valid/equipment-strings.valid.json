@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "base",
   "stacks": {
     "equipment": 1
   },
@@ -30,4 +29,3 @@
     "Bake in oven"
   ]
 }
-

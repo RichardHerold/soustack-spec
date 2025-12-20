@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "base",
   "stacks": {
     "prep": 1,
     "equipment": 1
@@ -30,8 +29,9 @@
   "miseEnPlace": [
     {
       "text": "Use the missing equipment",
-      "usesEquipment": ["missing-equipment"]
+      "usesEquipment": [
+        "missing-equipment"
+      ]
     }
   ]
 }
-

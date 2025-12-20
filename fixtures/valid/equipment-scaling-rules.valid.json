@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "base",
   "stacks": {
     "equipment": 1
   },
@@ -34,9 +33,18 @@
       "countScaling": {
         "mode": "threshold",
         "steps": [
-          { "maxFactor": 1.0, "count": 1 },
-          { "maxFactor": 2.0, "count": 2 },
-          { "maxFactor": 4.0, "count": 3 }
+          {
+            "maxFactor": 1.0,
+            "count": 1
+          },
+          {
+            "maxFactor": 2.0,
+            "count": 2
+          },
+          {
+            "maxFactor": 4.0,
+            "count": 3
+          }
         ]
       }
     },
@@ -44,7 +52,10 @@
       "id": "skillet_small",
       "name": "8-inch skillet",
       "upgrades": [
-        { "minFactor": 2.0, "use": "skillet_large" }
+        {
+          "minFactor": 2.0,
+          "use": "skillet_large"
+        }
       ]
     },
     {
@@ -63,4 +74,3 @@
     "Bake"
   ]
 }
-

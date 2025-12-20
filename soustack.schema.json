@@ -8,13 +8,6 @@
       "type": "string",
       "const": "https://soustack.spec/soustack.schema.json"
     },
-    "level": {
-      "type": "string",
-      "enum": [
-        "lite",
-        "base"
-      ]
-    },
     "profile": {
       "type": "string",
       "anyOf": [
@@ -158,7 +151,6 @@
     }
   },
   "required": [
-    "level",
     "stacks",
     "name",
     "ingredients",
@@ -167,9 +159,19 @@
   "allOf": [
     {
       "if": {
+        "required": [
+          "profile"
+        ],
         "properties": {
-          "level": {
-            "const": "base"
+          "profile": {
+            "enum": [
+              "base",
+              "equipped",
+              "illustrated",
+              "prepped",
+              "scalable",
+              "timed"
+            ]
           }
         }
       },

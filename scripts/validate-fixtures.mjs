@@ -283,12 +283,6 @@ function checkConformance(data, file, reg) {
     }
   }
 
-  if (hasStackVersion(stacksMap, 'compute', reg)) {
-    if (data.level !== 'base' || !hasStackVersion(stacksMap, 'quantified', reg) || !hasStackVersion(stacksMap, 'timed', reg)) {
-      errors.push('compute stack requires base level with quantified and timed stacks');
-    }
-  }
-
   if (hasStackVersion(stacksMap, 'scaling', reg)) {
     const ingredientIds = new Set(ingredients.map((i) => i.id));
     for (const ingredient of ingredients) {

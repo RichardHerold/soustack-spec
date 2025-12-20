@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "lite",
   "stacks": {
     "storage": 1
   },
@@ -18,8 +17,7 @@
       }
     },
     "leftovers": {
-      "reheat": "Microwave 2–3 minutes"
+      "reheat": "Microwave 2\u20133 minutes"
     }
   }
 }
-
