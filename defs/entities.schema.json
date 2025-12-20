@@ -27,9 +27,11 @@
             }
           ]
         },
-        "metadata": { "type": "object", "additionalProperties": true }
+        "metadata": { "type": "object", "additionalProperties": true },
+        "scaling": { "$ref": "./scalingRule.schema.json" }
       },
       "required": ["name"],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": { "$ref": "./common.schema.json#/properties/extensionLaneValue" }
       }
