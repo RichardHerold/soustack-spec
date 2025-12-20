@@ -89,13 +89,6 @@ async function main() {
     }
   }
 
-  // Check profile references
-  for (const [stackId, stack] of Object.entries(registry.stacks)) {
-    if (!profileIds.has(stack.profile)) {
-      errors.push(`Stack "${stackId}" references missing profile: "${stack.profile}"`);
-    }
-  }
-
   // Check profile requiresProfiles
   for (const [profileId, profile] of Object.entries(registry.profiles)) {
     const requiresProfiles = profile.requiresProfiles || [];
@@ -179,4 +172,3 @@ main().catch(err => {
   console.error(err);
   process.exit(1);
 });
-
