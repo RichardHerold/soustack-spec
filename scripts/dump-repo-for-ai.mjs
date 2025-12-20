@@ -12,7 +12,7 @@ const repoRoot = join(__dirname, '..');
 
 // Default configuration
 const DEFAULTS = {
-  outputFile: 'repo-pack.md',
+  outputFile: 'soustack-spec-repo-pack.md',
   maxFileKB: 500,
   maxTotalMB: 50,
 };
@@ -84,7 +84,7 @@ function parseArgs() {
 Usage: node scripts/dump-repo-for-ai.mjs [options]
 
 Options:
-  --out <filename>        Output file (default: repo-pack.md)
+  --out <filename>        Output file (default: soustack-spec-repo-pack.md)
   --maxFileKB <number>    Maximum file size in KB (default: 500)
   --maxTotalMB <number>   Maximum total output size in MB (default: 50)
   --help, -h              Show this help message
