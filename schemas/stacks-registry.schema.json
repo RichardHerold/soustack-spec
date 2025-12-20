@@ -63,7 +63,6 @@
         "properties": {
           "title": { "type": "string" },
           "latestMajor": { "type": "integer", "minimum": 1 },
-          "profile": { "type": "string" },
           "requires": {
             "type": "array",
             "items": { "type": "string" }
@@ -99,7 +98,7 @@
             "additionalProperties": false
           }
         },
-        "required": ["title", "latestMajor", "profile", "requires", "schema"],
+        "required": ["title", "latestMajor", "requires", "schema"],
         "additionalProperties": false
       }
     }
@@ -107,4 +106,3 @@
   "required": ["registryVersion", "spec", "profiles", "stacks"],
   "additionalProperties": false
 }
-
