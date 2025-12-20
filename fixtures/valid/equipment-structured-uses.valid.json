@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "base",
   "stacks": {
     "equipment": 1,
     "structured": 1
@@ -35,7 +34,10 @@
     {
       "id": "sear",
       "text": "Sear the meat in the skillet",
-      "usesEquipment": ["skillet", "spatula"]
+      "usesEquipment": [
+        "skillet",
+        "spatula"
+      ]
     },
     {
       "id": "rest",
@@ -43,4 +45,3 @@
     }
   ]
 }
-

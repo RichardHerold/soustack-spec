@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "base",
   "profile": "prepped",
   "stacks": {
     "prep": 1
@@ -23,7 +22,11 @@
     "Cook the ingredients"
   ],
   "miseEnPlace": [
-    { "text": "Finely dice the onion" },
-    { "text": "Mince the garlic" }
+    {
+      "text": "Finely dice the onion"
+    },
+    {
+      "text": "Mince the garlic"
+    }
   ]
 }

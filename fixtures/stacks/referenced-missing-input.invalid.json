@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "base",
   "stacks": {
     "structured": 1,
     "referenced": 1

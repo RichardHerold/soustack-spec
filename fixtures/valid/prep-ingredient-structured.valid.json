@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "base",
   "stacks": {
     "prep": 1,
     "quantified": 1
@@ -24,8 +23,14 @@
         "unit": "medium"
       },
       "prep": [
-        { "verb": "dice", "detail": "fine" },
-        { "verb": "reserve", "detail": "half for garnish" }
+        {
+          "verb": "dice",
+          "detail": "fine"
+        },
+        {
+          "verb": "reserve",
+          "detail": "half for garnish"
+        }
       ]
     }
   ],
@@ -33,7 +38,8 @@
     "Use the prepared ingredients"
   ],
   "miseEnPlace": [
-    { "text": "Prepare ingredients as specified" }
+    {
+      "text": "Prepare ingredients as specified"
+    }
   ]
 }
-

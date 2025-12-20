@@ -20,7 +20,6 @@ This document is **normative** unless otherwise noted.
 ## 2. Terminology
 
 * **Document**: A JSON object conforming to the Soustack root schema.
-* **Level**: A baseline classification (`lite` or `base`) defining minimum required structure.
 * **Profile**: A named, human-facing conformance target describing what a consumer may rely on.
 * **Stack**: A declared capability that activates additional structural and/or semantic requirements.
 * **Conformance**: Passing both schema validation and all required semantic checks.
@@ -34,18 +33,17 @@ Profiles are the **primary public contract** of the Soustack specification.
 
 A Profile defines a bundle of requirements expressed in terms of:
 
-* required `level`
 * required `stacks`
 * required semantic validation rules
 
-Profiles support an **adoption ladder**: publishers may start with minimal structure and progressively add capabilities without changing the overall document shape.
+Profiles support an **adoption ladder**: publishers can start at **Lite** with minimal structure, move to **Base** by adding `yield` and `time`, and then opt into stack-backed profiles like **Timed**, **Scalable**, or **Illustrated** as they add structure—without changing the overall document shape.
 
 ### 3.1 Profile Declaration
 
 * A document MAY declare a profile explicitly using a top-level `profile` field. The field is OPTIONAL; omission MUST NOT change document validity.
-* Tools MAY infer the profile from `level` and `stacks` when `profile` is absent.
+* Tools MAY infer the profile from declared `stacks` and required core fields when `profile` is absent.
 * `profile` is a single primary claim (no arrays or multi-profile declarations).
-* If a document declares both a `profile` and explicit `level`/`stacks`, they MUST NOT contradict. Contradictions MUST be treated as non-conformant.
+* If a document declares both a `profile` and explicit `stacks`, they MUST NOT contradict. Contradictions MUST be treated as non-conformant.
 
 ### 3.2 Stack Semantics
 
@@ -63,7 +61,7 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `level` MUST be `lite`.
+* No additional requirements beyond the core schema.
 
 **Guarantees**
 
@@ -78,7 +76,7 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `level` MUST be `base`.
+* `yield` and `time` MUST be present.
 
 **Guarantees**
 
@@ -92,7 +90,6 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `level` MUST be `base`.
 * `stacks[]` MUST include `illustrated@1`.
 
 **Semantic Requirements**
@@ -107,7 +104,6 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `level` MUST be `base`.
 * `stacks[]` MUST include `equipment@1`.
 
 ---
@@ -118,7 +114,6 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `level` MUST be `base`.
 * `stacks[]` MUST include `prep@1`.
 
 ---
@@ -129,7 +124,6 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `level` MUST be `base`.
 * `stacks[]` MUST include `structured@1` and `timed@1`.
 
 ---
@@ -140,7 +134,6 @@ Stacks that impose no additional structural or semantic requirements are not per
 
 **Requirements**
 
-* `level` MUST be `base`.
 * `stacks[]` MUST include `quantified@1` and `scaling@1`.
 
 **Semantic Requirements**
@@ -198,10 +191,10 @@ Non-normative guidance, examples, and adoption notes MAY be published separately
 
 | Profile | Requires Profiles | Requires Stacks | Description |
 | ------- | ---------------- | -------------- | ----------- |
-| **Base** | lite | — | Minimum cookable baseline |
+| **Base** | lite | — | Minimum cookable baseline with yield + time |
 | **Equipped** | base | equipment | Recipe declares required tools/equipment. |
 | **Illustrated** | base | illustrated | Media present |
-| **Lite** | — | — | Lowest-friction publishing |
+| **Lite** | — | — | Lowest-friction publishing with minimal structure |
 | **Prepped** | base | prep | Recipe includes prep guidance and/or mise en place tasks. |
 | **Scalable** | base | quantified, scaling | Quantified + scaling |
 | **Timed** | base | structured, timed | Structured + timed |

@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "base",
   "stacks": {
     "prep": 1,
     "referenced": 1,
@@ -26,14 +25,17 @@
     {
       "id": "cook",
       "text": "Cook",
-      "inputs": ["onion"]
+      "inputs": [
+        "onion"
+      ]
     }
   ],
   "miseEnPlace": [
     {
       "text": "Prepare the missing ingredient",
-      "inputs": ["missing-ingredient"]
+      "inputs": [
+        "missing-ingredient"
+      ]
     }
   ]
 }
-

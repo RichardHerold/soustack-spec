@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "base",
   "stacks": {
     "quantified": 1,
     "scaling": 1,
@@ -44,12 +43,18 @@
     {
       "id": "mix",
       "text": "Mix flour and water",
-      "inputs": ["flour", "water"]
+      "inputs": [
+        "flour",
+        "water"
+      ]
     },
     {
       "id": "bake",
       "text": "Bake the bread",
-      "inputs": ["flour", "water"]
+      "inputs": [
+        "flour",
+        "water"
+      ]
     }
   ],
   "scaling": {
@@ -60,4 +65,3 @@
     }
   }
 }
-

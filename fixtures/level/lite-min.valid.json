@@ -1,6 +1,6 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "lite",
+  "profile": "lite",
   "stacks": {},
   "name": "Simple Toast",
   "ingredients": [

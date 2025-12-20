@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "base",
   "stacks": {
     "quantified": 1
   },
@@ -60,4 +59,3 @@
     "Knead dough"
   ]
 }
-

@@ -7,8 +7,8 @@
     "canonicalStacksFormat": "map"
   },
   "profiles": {
-    "lite": { "title": "Lite", "description": "Lowest-friction publishing", "requiresProfiles": [], "requiresStacks": [] },
-    "base": { "title": "Base", "description": "Minimum cookable baseline", "requiresProfiles": ["lite"], "requiresStacks": [] },
+    "lite": { "title": "Lite", "description": "Lowest-friction publishing with minimal structure", "requiresProfiles": [], "requiresStacks": [] },
+    "base": { "title": "Base", "description": "Minimum cookable baseline with yield + time", "requiresProfiles": ["lite"], "requiresStacks": [] },
     "scalable": { "title": "Scalable", "description": "Quantified + scaling", "requiresProfiles": ["base"], "requiresStacks": ["quantified", "scaling"] },
     "timed": { "title": "Timed", "description": "Structured + timed", "requiresProfiles": ["base"], "requiresStacks": ["structured", "timed"] },
     "illustrated": { "title": "Illustrated", "description": "Media present", "requiresProfiles": ["base"], "requiresStacks": ["illustrated"] },

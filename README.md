@@ -8,7 +8,7 @@ The goal of Soustack is **universal adoption**: recipes should be publishable wi
 This repository defines the **normative specification**:
 
 * JSON Schemas
-* Profiles (adoption levels)
+* Profiles (adoption ladder)
 * Stack contracts
 * Conformance rules
 * Validation fixtures
@@ -40,15 +40,7 @@ UI and integrations live in **Soustack Blocks**.
 
 ## Adoption Philosophy
 
-Soustack is designed around **incremental compliance**, not all-or-nothing adoption.
-
-A site should be able to:
-
-* start by publishing minimal Soustack JSON
-* gain immediate value (e.g. embeds, scaling)
-* progressively add structure without rewriting content
-
-This is achieved through **Profiles** and **Stacks**.
+Soustack is designed around **incremental compliance**, not all-or-nothing adoption: publishers can start at **Lite** with minimal structure, move to **Base** by adding `yield` and `time`, and then opt into stack-backed profiles like **Timed**, **Scalable**, or **Illustrated** as they add structure—without changing the overall document shape.
 
 ---
 
@@ -97,8 +89,10 @@ Example:
 
 ```json
 {
-  "level": "base",
-  "stacks": ["quantified@1", "scaling@1"]
+  "profile": "scalable",
+  "stacks": ["quantified@1", "scaling@1"],
+  "yield": { "amount": 4, "unit": "servings" },
+  "time": { "total": { "minutes": 30 } }
 }
 ```
 
@@ -250,10 +244,10 @@ MIT
 
 | Profile | Requires Profiles | Requires Stacks | Description |
 | ------- | ---------------- | -------------- | ----------- |
-| **Base** | lite | — | Minimum cookable baseline |
+| **Base** | lite | — | Minimum cookable baseline with yield + time |
 | **Equipped** | base | equipment | Recipe declares required tools/equipment. |
 | **Illustrated** | base | illustrated | Media present |
-| **Lite** | — | — | Lowest-friction publishing |
+| **Lite** | — | — | Lowest-friction publishing with minimal structure |
 | **Prepped** | base | prep | Recipe includes prep guidance and/or mise en place tasks. |
 | **Scalable** | base | quantified, scaling | Quantified + scaling |
 | **Timed** | base | structured, timed | Structured + timed |

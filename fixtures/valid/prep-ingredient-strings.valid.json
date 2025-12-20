@@ -1,6 +1,5 @@
 {
   "$schema": "https://soustack.spec/soustack.schema.json",
-  "level": "base",
   "stacks": {
     "prep": 1,
     "quantified": 1
@@ -32,14 +31,18 @@
         "amount": 2,
         "unit": "cloves"
       },
-      "prep": ["peeled", "minced"]
+      "prep": [
+        "peeled",
+        "minced"
+      ]
     }
   ],
   "instructions": [
     "Cook the ingredients"
   ],
   "miseEnPlace": [
-    { "text": "Prepare ingredients as specified" }
+    {
+      "text": "Prepare ingredients as specified"
+    }
   ]
 }
-
