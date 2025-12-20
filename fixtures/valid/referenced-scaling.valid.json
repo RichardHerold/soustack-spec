@@ -32,10 +32,12 @@
         "amount": 325,
         "unit": "g"
       },
-      "scaling": {
-        "mode": "bakersPercent",
-        "percent": 65,
-        "of": "flour"
+      "metadata": {
+        "scaling": {
+          "mode": "bakersPercent",
+          "percent": 65,
+          "of": "flour"
+        }
       }
     }
   ],

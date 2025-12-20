@@ -30,6 +30,7 @@
         "metadata": { "type": "object", "additionalProperties": true }
       },
       "required": ["name"],
+      "additionalProperties": false,
       "patternProperties": {
         "^x-": { "$ref": "./common.schema.json#/properties/extensionLaneValue" }
       }
