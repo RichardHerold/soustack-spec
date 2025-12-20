@@ -1,11 +1,10 @@
 {
-  "$schema": "https://soustack.spec/soustack.schema.json",
   "level": "base",
   "profile": "prepped",
   "stacks": {
     "prep": 1
   },
-  "name": "Prepped Profile Recipe",
+  "name": "Prepped Recipe",
   "yield": {
     "amount": 4,
     "unit": "servings"
@@ -20,7 +19,7 @@
     "garlic"
   ],
   "instructions": [
-    "Cook the ingredients"
+    "Cook the ingredients."
   ],
   "miseEnPlace": [
     { "text": "Finely dice the onion" },

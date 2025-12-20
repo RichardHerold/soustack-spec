@@ -1,0 +1,26 @@
+{
+  "level": "base",
+  "profile": "illustrated",
+  "stacks": {
+    "illustrated": 1
+  },
+  "name": "Illustrated Recipe",
+  "yield": {
+    "amount": 1,
+    "unit": "serving"
+  },
+  "time": {
+    "total": {
+      "minutes": 5
+    }
+  },
+  "images": [
+    "https://example.com/image.jpg"
+  ],
+  "ingredients": [
+    "bread"
+  ],
+  "instructions": [
+    "Toast the bread."
+  ]
+}
