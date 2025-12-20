@@ -54,22 +54,13 @@ async function walk(dir) {
   return files;
 }
 
-function normalizeStacksToMap(stacks) {
-  // Convert array format to map format if needed
+function getStacksMap(stacks, errors) {
+  if (stacks === undefined) {
+    return {};
+  }
   if (Array.isArray(stacks)) {
-    const map = {};
-    for (const entry of stacks) {
-      if (typeof entry === 'string') {
-        const match = entry.match(/^([^@]+)@(\d+)$/);
-        if (match) {
-          const [, name, major] = match;
-          map[name] = parseInt(major, 10);
-        } else {
-          throw new Error(`Invalid stack format: ${entry} (must be name@major)`);
-        }
-      }
-    }
-    return map;
+    errors.push('stacks must be an object map of stack ids to major versions');
+    return {};
   }
   if (typeof stacks === 'object' && stacks !== null) {
     return stacks;
@@ -185,15 +176,7 @@ function validateDAG(steps) {
 function checkConformance(data, file, reg) {
   const errors = [];
   
-  // Normalize stacks to map format
-  let stacksMap;
-  let warnedArray = false;
-  if (Array.isArray(data.stacks)) {
-    warnedArray = true;
-    stacksMap = normalizeStacksToMap(data.stacks);
-  } else {
-    stacksMap = normalizeStacksToMap(data.stacks || {});
-  }
+  const stacksMap = getStacksMap(data.stacks, errors);
   
   // Validate stacks against registry
   const officialStacks = Object.keys(reg.stacks).filter(id => !id.startsWith('x-'));
@@ -226,10 +209,6 @@ function checkConformance(data, file, reg) {
         }
       }
     }
-  }
-  
-  if (warnedArray) {
-    console.warn(`Warning: ${file} uses array stacks format. Should migrate to map format.`);
   }
   
   const stacks = getStacksSet(stacksMap);
@@ -485,11 +464,6 @@ async function main() {
     if (!expectValid && !expectInvalid) {
       console.warn(`Skipping fixture without expectation: ${file}`);
       continue;
-    }
-
-    // Normalize stacks to map for schema validation
-    if (Array.isArray(data.stacks)) {
-      data = { ...data, stacks: normalizeStacksToMap(data.stacks) };
     }
 
     const schemaOk = validate(data);
