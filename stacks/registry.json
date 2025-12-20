@@ -19,7 +19,6 @@
     "quantified": {
       "title": "Quantified",
       "latestMajor": 1,
-      "profile": "scalable",
       "requires": [],
       "schema": { "major": { "1": "stacks/quantified.schema.json" } },
       "docs": { "major": { "1": "stacks/quantified@1.md" } }
@@ -27,7 +26,6 @@
     "scaling": {
       "title": "Scaling",
       "latestMajor": 1,
-      "profile": "scalable",
       "requires": ["quantified"],
       "schema": { "major": { "1": "stacks/scaling.schema.json" } },
       "docs": { "major": { "1": "stacks/scaling@1.md" } }
@@ -35,7 +33,6 @@
     "structured": {
       "title": "Structured",
       "latestMajor": 1,
-      "profile": "timed",
       "requires": [],
       "schema": { "major": { "1": "stacks/structured.schema.json" } },
       "docs": { "major": { "1": "stacks/structured@1.md" } }
@@ -43,7 +40,6 @@
     "timed": {
       "title": "Timed",
       "latestMajor": 1,
-      "profile": "timed",
       "requires": ["structured"],
       "schema": { "major": { "1": "stacks/timed.schema.json" } },
       "docs": { "major": { "1": "stacks/timed@1.md" } }
@@ -51,7 +47,6 @@
     "referenced": {
       "title": "Referenced",
       "latestMajor": 1,
-      "profile": "timed",
       "requires": ["structured"],
       "schema": { "major": { "1": "stacks/referenced.schema.json" } },
       "docs": { "major": { "1": "stacks/referenced@1.md" } }
@@ -59,7 +54,6 @@
     "illustrated": {
       "title": "Illustrated",
       "latestMajor": 1,
-      "profile": "illustrated",
       "requires": [],
       "schema": { "major": { "1": "stacks/illustrated.schema.json" } },
       "docs": { "major": { "1": "stacks/illustrated@1.md" } }
@@ -67,7 +61,6 @@
     "dietary": {
       "title": "Dietary",
       "latestMajor": 1,
-      "profile": "lite",
       "requires": [],
       "schema": { "major": { "1": "stacks/dietary.schema.json" } },
       "docs": { "major": { "1": "stacks/dietary@1.md" } }
@@ -75,7 +68,6 @@
     "substitutions": {
       "title": "Substitutions",
       "latestMajor": 1,
-      "profile": "lite",
       "requires": ["referenced"],
       "schema": { "major": { "1": "stacks/substitutions.schema.json" } },
       "docs": { "major": { "1": "stacks/substitutions@1.md" } }
@@ -83,7 +75,6 @@
     "techniques": {
       "title": "Techniques",
       "latestMajor": 1,
-      "profile": "lite",
       "requires": [],
       "schema": { "major": { "1": "stacks/techniques.schema.json" } },
       "docs": { "major": { "1": "stacks/techniques@1.md" } }
@@ -91,7 +82,6 @@
     "storage": {
       "title": "Storage",
       "latestMajor": 1,
-      "profile": "lite",
       "requires": [],
       "schema": { "major": { "1": "stacks/storage.schema.json" } },
       "docs": { "major": { "1": "stacks/storage@1.md" } }
@@ -99,7 +89,6 @@
     "compute": {
       "title": "Compute",
       "latestMajor": 1,
-      "profile": "lite",
       "requires": ["quantified", "timed"],
       "schema": { "major": { "1": "stacks/compute.schema.json" } },
       "docs": { "major": { "1": "stacks/compute@1.md" } }
@@ -107,7 +96,6 @@
     "equipment": {
       "title": "Equipment",
       "latestMajor": 1,
-      "profile": "lite",
       "requires": [],
       "schema": { "major": { "1": "stacks/equipment.schema.json" } },
       "docs": { "major": { "1": "stacks/equipment@1.md" } }
@@ -115,7 +103,6 @@
     "prep": {
       "title": "Prep",
       "latestMajor": 1,
-      "profile": "lite",
       "requires": [],
       "schema": { "major": { "1": "stacks/prep.schema.json" } },
       "docs": { "major": { "1": "stacks/prep@1.md" } }

@@ -31,8 +31,18 @@ function generateProfilesTable(registry) {
 
 function generateStacksTable(registry) {
   const rows = [];
-  rows.push('| Stack ID | Latest Major | Requires | Profile | Schema | Docs |');
-  rows.push('| -------- | ----------- | -------- | ------- | ------ | ---- |');
+  rows.push('| Stack ID | Latest Major | Requires | Required by Profiles | Schema | Docs |');
+  rows.push('| -------- | ----------- | -------- | -------------------- | ------ | ---- |');
+
+  const requiredByProfiles = {};
+  for (const [profileId, profile] of Object.entries(registry.profiles)) {
+    for (const stackId of profile.requiresStacks || []) {
+      if (!requiredByProfiles[stackId]) {
+        requiredByProfiles[stackId] = [];
+      }
+      requiredByProfiles[stackId].push(profileId);
+    }
+  }
   
   // Sort stacks alphabetically for deterministic output
   const stackIds = Object.keys(registry.stacks).sort();
@@ -40,9 +50,10 @@ function generateStacksTable(registry) {
   for (const id of stackIds) {
     const stack = registry.stacks[id];
     const requires = stack.requires.length > 0 ? stack.requires.join(', ') : '—';
+    const requiredBy = requiredByProfiles[id]?.sort().join(', ') || '—';
     const schemaPath = stack.schema.major[String(stack.latestMajor)] || '—';
     const docPath = stack.docs?.major?.[String(stack.latestMajor)] || '—';
-    rows.push(`| **${id}** | ${stack.latestMajor} | ${requires} | ${stack.profile} | \`${schemaPath}\` | ${docPath !== '—' ? `\`${docPath}\`` : '—'} |`);
+    rows.push(`| **${id}** | ${stack.latestMajor} | ${requires} | ${requiredBy} | \`${schemaPath}\` | ${docPath !== '—' ? `\`${docPath}\`` : '—'} |`);
   }
   
   return rows.join('\n');
@@ -99,4 +110,3 @@ main().catch(err => {
   console.error(err);
   process.exit(1);
 });
-
