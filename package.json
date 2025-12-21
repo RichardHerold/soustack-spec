@@ -2,11 +2,22 @@
   "name": "soustack-spec",
   "version": "0.0.1",
   "type": "module",
-  "private": true,
+  "license": "CC0-1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/RichardHerold/soustack-spec.git"
   },
+  "files": [
+    "soustack.schema.json",
+    "defs/",
+    "stacks/",
+    "schemas/",
+    "fixtures/",
+    "registry.json",
+    "SOUSTACK_SPEC_VERSION",
+    "SPEC.md",
+    "README.md"
+  ],
   "scripts": {
     "guard": "node scripts/guard-no-legacy.mjs",
     "check-refs": "node scripts/check-schema-refs.mjs",
