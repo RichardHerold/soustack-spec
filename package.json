@@ -31,6 +31,7 @@
     "build": "tsc -p tsconfig.json",
     "prepack": "npm run build",
     "guard": "node scripts/guard-no-legacy.mjs",
+    "guard:canonical-host": "node scripts/guard-canonical-host.mjs",
     "check-refs": "node scripts/check-schema-refs.mjs",
     "validate": "node scripts/validate-fixtures.mjs",
     "verify:version": "node scripts/verify-version.mjs",
@@ -39,7 +40,7 @@
     "build:schemas": "node scripts/generate-stack-gating.mjs",
     "docs:sync": "node scripts/generate-docs-from-registry.mjs",
     "verify:generated": "node scripts/verify-generated-clean.mjs",
-    "verify": "npm run verify:version && npm run verify:registry && npm run verify:stack-docs && npm run check-refs && npm run guard && npm run validate && npm run verify:generated",
+    "verify": "npm run verify:version && npm run verify:registry && npm run verify:stack-docs && npm run check-refs && npm run guard && npm run guard:canonical-host && npm run validate && npm run verify:generated",
     "test": "npm run verify"
   },
   "devDependencies": {

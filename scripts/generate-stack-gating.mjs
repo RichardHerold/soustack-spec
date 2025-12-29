@@ -57,11 +57,11 @@ function rewriteRefs(obj, schemaId, schemaBasePath) {
         }
         // Convert to absolute URI, ensuring no double slashes
         const normalized = finalPath.replace(/\\/g, '/').replace(/^\/+/, '').replace(/\/+/g, '/');
-        result[key] = `https://soustack.spec/${normalized}`;
+        result[key] = `https://spec.soustack.org/${normalized}`;
       } else if (!value.includes('://') && !value.startsWith('#')) {
         // Relative path without ./ or ../ - assume it's relative to defs or stacks
         // This shouldn't happen in our schemas, but handle it
-        result[key] = `https://soustack.spec/${value}`;
+        result[key] = `https://spec.soustack.org/${value}`;
       } else {
         // Already absolute or external reference
         result[key] = value;
@@ -92,7 +92,7 @@ async function loadStackSchema(schemaPath) {
   const required = schema.required || [];
   
   // Use the schema's $id if available, otherwise construct from path
-  const schemaId = schema.$id || `https://soustack.spec/${schemaPath.replace(/\\/g, '/')}`;
+  const schemaId = schema.$id || `https://spec.soustack.org/${schemaPath.replace(/\\/g, '/')}`;
   
   // Collect all $defs names used in the properties
   const defsUsed = new Set();
@@ -266,7 +266,7 @@ async function generateStackGatingRule(stackId, stack, registry, allDefs) {
         for (const [key, value] of Object.entries(obj)) {
           if (key === '$ref' && typeof value === 'string') {
             // If it references one of our $defs, update to namespaced version
-            const defMatch = value.match(/^https:\/\/soustack\.spec\/stacks\/[^#]+#\/\$defs\/(.+)$/);
+            const defMatch = value.match(/^https:\/\/spec\.soustack\.org\/stacks\/[^#]+#\/\$defs\/(.+)$/);
             if (defMatch && defNameMap.has(defMatch[1])) {
               result[key] = `#/$defs/${defNameMap.get(defMatch[1])}`;
             } else {
