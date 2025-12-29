@@ -231,6 +231,8 @@ Contributions should:
 
 If in doubt, **opt for clarity over cleverness**.
 
+> **Note:** Do not commit `dist/`; it is build output. The `prepack` script builds it automatically before npm publishing.
+
 ---
 
 ## License
