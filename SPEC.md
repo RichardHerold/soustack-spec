@@ -183,6 +183,12 @@ This specification uses semantic versioning. Schema identifiers and conformance 
 
 Non-normative guidance, examples, and adoption notes MAY be published separately and are not part of this specification.
 
+### 9.1 Legacy Namespace
+
+**Note:** This section is non-normative.
+
+The canonical host for Soustack schema identifiers and references is `https://spec.soustack.org`. The previous host `https://soustack.spec` is legacy and MUST NOT be used for new identifiers or references. Implementations should use `https://spec.soustack.org` for all schema resolution and validation.
+
 
 
 <!-- BEGIN GENERATED: STACK REGISTRY -->

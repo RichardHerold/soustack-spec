@@ -449,7 +449,7 @@ function checkConformance(data, file, reg) {
 async function main() {
   await loadSchemas();
   const reg = await loadRegistry();
-  const validate = ajv.getSchema('https://soustack.spec/soustack.schema.json');
+  const validate = ajv.getSchema('https://spec.soustack.org/soustack.schema.json');
   if (!validate) throw new Error('main schema not loaded');
 
   const fixtureFiles = await walk('fixtures');
