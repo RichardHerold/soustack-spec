@@ -1,5 +1,6 @@
 {
-  "name": "soustack-spec",
+  "name": "@soustack/spec",
+  "publishConfig": { "access": "public" },
   "version": "0.0.2",
   "type": "module",
   "license": "CC0-1.0",
